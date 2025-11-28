@@ -7,11 +7,11 @@
 
 ---
 
-## 📖 Deskripsi
+## Deskripsi
 
 **Nusantara Food Watch** adalah sistem scraping dan dashboard untuk memantau harga pangan strategis di Indonesia secara real-time. Data diambil dari **PIHPS (Pusat Informasi Harga Pangan Strategis)** Bank Indonesia.
 
-### ✨ Fitur Utama
+### Fitur Utama
 
 - ✅ **Scraping Otomatis**: Ambil data harga dari 34 provinsi Indonesia
 - ✅ **API-Based**: Tidak butuh Selenium, hanya HTTP requests (cepat & ringan)
@@ -22,7 +22,7 @@
 
 ---
 
-## 🏗️ Arsitektur
+## Arsitektur
 
 ```
 ┌─────────────────┐
@@ -41,8 +41,67 @@
 │ Streamlit App   │  ← Dashboard
 └─────────────────┘
 ```
+---
 
-## 📈 Roadmap
+## Project Structure
+
+```
+nusantara_food/
+├── dump/
+│   └── __init__.py
+├── data/
+│   ├── raw
+│   ├── interim
+│   └── processed
+├── src/
+│   ├── scraper/
+│   │   ├── debug/
+│   │   │   ├── debug_api.py
+│   │   │   ├── debug_monthly.py
+│   │   │   └── find_endpoint.py
+│   │   ├── pihps_scraper.py
+│   │   └── app_scraper.py
+│   ├── data_analysis/
+│   │   ├── cleaning.py
+│   │   ├── visualize.py
+│   │   ├── forecast.py
+│   │   └── app_analysis.py
+│   ├── models/
+│   │   └── __init__.py
+│   ├── .streamlit
+│   ├── dashboard/
+│   │   ├── docs/
+│   │   │   └── README
+│   │   ├── .streamlit
+│   │   ├── app.py
+│   │   ├── setup.py
+│   │   ├── test.py
+│   │   ├── requirements.txt
+│   │   ├── Dockerfile
+│   │   └── deploy_to_hf/
+│   │       ├── .streamlit
+│   │       ├── src/
+│   │       │   └── __init__.py
+│   │       ├── app.py
+│   │       ├── README
+│   │       └── requirements.txt
+│   └── db/
+│       ├── test_db_setup.py
+│       └── nusantara_db.py
+├── notebooks/
+│   ├── cleaning.ipynb
+│   ├── visualize.ipynb
+│   └── forecast.ipynb
+├── .gitignore
+├── README
+├── requirements.txt
+├── main.py
+└── .env
+```
+
+---
+
+## Roadmap
 
 ### Sprint 1 (Week 1) ✅
 - [x] Investigasi API endpoints
@@ -69,26 +128,26 @@
 - [ ] Prepare demo/presentation
 
 ---
+## Tech Stack
 
-## 🤝 Contributing
-
-Kontribusi sangat diterima! Silakan:
-
-1. Fork repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
+| Category | Technology |
+|----------|------------|
+| **Language & Core** | ![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white) |
+| **Data Processing** | ![Pandas](https://img.shields.io/badge/Pandas-150458?logo=pandas&logoColor=white) ![NumPy](https://img.shields.io/badge/Numpy-013243?logo=numpy&logoColor=white) |
+| **Modeling** | ![Statsmodels](https://img.shields.io/badge/Statsmodels-2C3E50?logo=python&logoColor=white) |
+| **Visualization** | ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white) ![Plotly](https://img.shields.io/badge/Plotly-3F4F75?logo=plotly&logoColor=white) |
+| **Database** | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?logo=postgresql&logoColor=white) ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white) |
+| **Deployment & Ops** | ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white) ![Git](https://img.shields.io/badge/Git-F05032?logo=git&logoColor=white) ![HuggingFace](https://img.shields.io/badge/Hugging%20Face-FFD21E?logo=huggingface&logoColor=black) |
 
 ---
 
-## 📝 License
+## License
 
 MIT License - lihat [LICENSE](LICENSE) file
 
 ---
 
-## 👥 Team
+## Team
 
 **Project Manager:** [Ayat Tulloh Rahulloh Khomeini]
 
@@ -101,7 +160,7 @@ MIT License - lihat [LICENSE](LICENSE) file
 
 ---
 
-## 📧 Contact
+## Contact
 
 - Email: dkhomeini79@gmail.com
 - GitHub: [@atrkhomeini](https://github.com/atrkhomeini)
@@ -109,7 +168,7 @@ MIT License - lihat [LICENSE](LICENSE) file
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Data source: [PIHPS Bank Indonesia](https://www.bi.go.id/hargapangan/)
 - Kementerian Pertanian RI
@@ -117,7 +176,7 @@ MIT License - lihat [LICENSE](LICENSE) file
 
 ---
 
-## 📊 Project Stats
+## Project Stats
 
 ![GitHub stars](https://img.shields.io/github/stars/atrkhomeini/nusantara-food-watch?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/atrkhomeini/nusantara-food-watch?style=social)
