@@ -6,7 +6,7 @@ Supports all 10 food commodities with monthly aggregation
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
-from db.nusantara_db import NusantaraDatabase
+from src.db.nusantara_db import NusantaraDatabase
 import time
 import logging
 import json
