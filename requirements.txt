@@ -1,26 +1,121 @@
-# Requirements untuk Nusantara Food Watch - PIHPS Scraper
+# ============================================================================
+# NUSANTARA FOOD WATCH - REQUIREMENTS
+# Complete dependency list for data scraping, analysis, and dashboard
+# Last Updated: 2025-11-28
+# Python Version: 3.10+
+# ============================================================================
 
-# Core libraries
-requests==2.31.0
-pandas==2.1.3
-numpy==1.26.2
+# ============================================================================
+# CORE DATA PROCESSING
+# ============================================================================
+pandas==2.1.3                 # Data manipulation and analysis
+numpy==1.26.2                 # Numerical computing
+python-dateutil==2.8.2        # Date/time utilities
 
-# Database (pilih salah satu atau semua)
-psycopg2-binary==2.9.9  # PostgreSQL
-sqlalchemy==2.0.23       # ORM
+# ============================================================================
+# DATABASE
+# ============================================================================
+psycopg2-binary==2.9.9        # PostgreSQL adapter (Supabase)
+SQLAlchemy==2.0.23            # SQL toolkit and ORM
+python-dotenv==1.0.0          # Environment variable management
 
-# Data visualization (untuk dashboard nanti)
-streamlit==1.29.0
-plotly==5.18.0
-folium==0.15.1
+# ============================================================================
+# WEB SCRAPING & API
+# ============================================================================
+requests==2.31.0              # HTTP library for API calls
+beautifulsoup4==4.12.2        # HTML/XML parsing
+lxml==4.9.3                   # XML processing
+urllib3==2.1.0                # HTTP client
 
-# Utilities
-python-dotenv==1.0.0    # Environment variables
-schedule==1.2.0         # Job scheduling
-pytz==2023.3           # Timezone handling
+# ============================================================================
+# DATA ANALYSIS & VISUALIZATION
+# ============================================================================
+matplotlib==3.8.2             # Plotting library
+seaborn==0.13.0               # Statistical visualization
+plotly==5.18.0                # Interactive visualizations
 
-# Testing & Development
-pytest==7.4.3
-pytest-cov==4.1.0
-black==23.12.0         # Code formatter
-flake8==6.1.0          # Linter
+# ============================================================================
+# JUPYTER NOTEBOOKS
+# ============================================================================
+jupyter==1.0.0                # Jupyter metapackage
+ipykernel==6.27.1             # IPython kernel for Jupyter
+notebook==7.0.6               # Jupyter notebook interface
+ipython==8.18.1               # Enhanced Python shell
+nbformat==5.9.2               # Notebook format
+
+# ============================================================================
+# STATISTICAL ANALYSIS & MACHINE LEARNING
+# ============================================================================
+statsmodels==0.14.1           # Statistical models
+scikit-learn==1.3.2           # Machine learning
+scipy==1.11.4                 # Scientific computing
+
+# ============================================================================
+# TIME SERIES FORECASTING (Optional - uncomment if needed)
+# ============================================================================
+# prophet==1.1.5              # Facebook Prophet for forecasting
+# pmdarima==2.0.4             # Auto ARIMA
+
+# ============================================================================
+# DASHBOARD & WEB FRAMEWORK
+# ============================================================================
+streamlit==1.29.0             # Dashboard framework
+
+# ============================================================================
+# FILE HANDLING
+# ============================================================================
+openpyxl==3.1.2               # Excel file support (.xlsx)
+xlrd==2.0.1                   # Old Excel format (.xls)
+pyxlsb==1.0.10                # Excel binary format
+
+# ============================================================================
+# UTILITIES
+# ============================================================================
+tqdm==4.66.1                  # Progress bars
+colorama==0.4.6               # Colored terminal output
+
+# ============================================================================
+# DEVELOPMENT & TESTING
+# ============================================================================
+pytest==7.4.3                 # Testing framework
+pytest-cov==4.1.0             # Test coverage
+black==23.12.0                # Code formatter
+flake8==6.1.0                 # Linter
+autopep8==2.0.4               # Auto PEP8 formatter
+
+# ============================================================================
+# OPTIONAL: ADVANCED FEATURES
+# ============================================================================
+# If you need these features, uncomment:
+
+# Natural Language Processing
+# nltk==3.8.1
+# spacy==3.7.2
+
+# Image Processing
+# Pillow==10.1.0
+
+# PDF Processing  
+# PyPDF2==3.0.1
+# reportlab==4.0.7
+
+# Cloud Storage
+# boto3==1.34.14              # AWS S3
+# google-cloud-storage==2.10.0  # Google Cloud Storage
+
+# ============================================================================
+# NOTES
+# ============================================================================
+# Installation:
+#   pip install -r requirements.txt
+#
+# Update requirements after installing new packages:
+#   pip freeze > requirements.txt
+#
+# Create virtual environment first:
+#   python -m venv venv
+#   venv\Scripts\activate  (Windows)
+#   source venv/bin/activate  (Linux/Mac)
+#
+# Verify installation:
+#   python test_dependencies.py
