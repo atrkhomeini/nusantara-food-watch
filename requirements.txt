@@ -28,6 +28,12 @@ lxml==4.9.3                   # XML processing
 urllib3==2.1.0                # HTTP client
 
 # ============================================================================
+# EMAIL NOTIFICATIONS (NEW!)
+# ============================================================================
+# Note: Python's built-in smtplib is used (no additional install needed)
+# Just ensure you have Python 3.10+ installed
+
+# ============================================================================
 # DATA ANALYSIS & VISUALIZATION
 # ============================================================================
 matplotlib==3.8.2             # Plotting library
@@ -119,3 +125,7 @@ autopep8==2.0.4               # Auto PEP8 formatter
 #
 # Verify installation:
 #   python test_dependencies.py
+#
+# Email Configuration:
+#   Uses Python's built-in smtplib and email libraries
+#   No additional packages needed for Gmail SMTP
