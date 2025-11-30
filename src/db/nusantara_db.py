@@ -80,34 +80,52 @@ class NusantaraDatabase:
             tanggal DATE NOT NULL,
             harga NUMERIC(10, 2),
             commodity_category VARCHAR(50),
-            report_type VARCHAR(20) DEFAULT 'daily',
-            market_type_id INTEGER DEFAULT 1,
+            commodity_id VARCHAR(20),
+            commodity_name VARCHAR(100),
+            subcategory VARCHAR(100),
+            market_type_id INTEGER,
             market_type_name VARCHAR(50),
             market_type_short VARCHAR(20),
+            report_type VARCHAR(20) DEFAULT 'daily',
             scraped_at TIMESTAMP DEFAULT NOW(),
             source VARCHAR(50) DEFAULT 'PIHPS/BI',
-            
-            -- Prevent duplicate entries
-            UNIQUE(provinsi, tanggal, commodity_category, report_type, market_type_id)
+            UNIQUE(provinsi, tanggal, commodity_category, report_type, market_type_id, subcategory)
         );
         
-        -- Create indexes for better query performance
+        -- Enable RLS
+        ALTER TABLE harga_pangan ENABLE ROW LEVEL SECURITY;
+        
+        -- Create RLS policies
+        DROP POLICY IF EXISTS "Allow public read access" ON harga_pangan;
+        CREATE POLICY "Allow public read access"
+        ON harga_pangan
+        FOR SELECT
+        USING (true);
+        
+        DROP POLICY IF EXISTS "Allow authenticated insert" ON harga_pangan;
+        CREATE POLICY "Allow authenticated insert"
+        ON harga_pangan
+        FOR INSERT
+        WITH CHECK (auth.role() = 'authenticated');
+        
+        DROP POLICY IF EXISTS "Allow authenticated update" ON harga_pangan;
+        CREATE POLICY "Allow authenticated update"
+        ON harga_pangan
+        FOR UPDATE
+        USING (auth.role() = 'authenticated');
+        
+        -- Create indexes
         CREATE INDEX IF NOT EXISTS idx_tanggal ON harga_pangan(tanggal);
         CREATE INDEX IF NOT EXISTS idx_provinsi ON harga_pangan(provinsi);
         CREATE INDEX IF NOT EXISTS idx_harga ON harga_pangan(harga);
         CREATE INDEX IF NOT EXISTS idx_market_type ON harga_pangan(market_type_id);
         CREATE INDEX IF NOT EXISTS idx_scraped_at ON harga_pangan(scraped_at);
         
-        -- Create view for latest prices per market type
+        -- Create views (without SECURITY DEFINER)
         CREATE OR REPLACE VIEW latest_prices AS
         SELECT DISTINCT ON (provinsi, commodity_category, market_type_id)
-            provinsi,
-            tanggal,
-            harga,
-            commodity_category,
-            market_type_id,
-            market_type_name,
-            scraped_at
+            provinsi, tanggal, harga, commodity_category,
+            market_type_id, market_type_name, scraped_at
         FROM harga_pangan
         ORDER BY provinsi, commodity_category, market_type_id, tanggal DESC;
         
