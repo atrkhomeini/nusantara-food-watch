@@ -176,7 +176,7 @@ NEXT STEPS
 
 ---
 This is an automated message from Nusantara Food Watch scraper.
-Project: github.com/YOUR_USERNAME/nusantara-food-watch
+Project: github.com/atrkhomeini/nusantara-food-watch
 """
     
     subject = f"Daily Scrape Success - {records_count:,} records"
@@ -238,7 +238,7 @@ RECOMMENDED ACTIONS
 MANUAL RE-RUN
 -------------
 To manually trigger scraper:
-1. Go to: github.com/YOUR_USERNAME/nusantara-food-watch/actions
+1. Go to: github.com/atrkhomeini/nusantara-food-watch/actions
 2. Select "Daily Food Price Scraper"
 3. Click "Run workflow"
 
