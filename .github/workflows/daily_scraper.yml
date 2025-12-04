@@ -15,9 +15,9 @@ name: Daily Food Price Scraper
 
 on:
   schedule:
-    # Run every day at 6:00 AM Jakarta time (11:00 PM UTC previous day)
+    # Run every day at 8:30 AM Jakarta time (11:00 PM UTC previous day)
     # Cron format: minute hour day month day-of-week
-    - cron: '0 23 * * *'
+    - cron: '30 1 * * *'
   
   workflow_dispatch:  # Allow manual trigger from GitHub UI
     inputs:
