@@ -361,7 +361,7 @@ class EnhancedMultiCommodityScraper:
         logger.info(f"Provinces: {df_combined['provinsi'].nunique()}")
         
         return df_combined
-    
+
     def scrape_monthly_historical(
         self,
         years_back: int = 8,

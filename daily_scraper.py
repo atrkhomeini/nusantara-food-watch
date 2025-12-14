@@ -1,249 +1,371 @@
 """
-Daily Scraper for Nusantara Food Watch
-Automated daily scraping script for GitHub Actions
+COMPLETE DAILY SCRAPER - Categories + Subcategories
+Scrapes BOTH category-level AND subcategory-level data
 
-This script:
-1. Scrapes yesterday's data (most recent complete day)
-2. Scrapes all commodities and market types
-3. Inserts to database
-4. Sends email notification
+This ensures complete coverage:
+- Categories (cat_*): For aggregated analysis
+- Subcategories (com_*): For quality-level detail
 
 Usage:
-    python daily_scraper.py                    # Scrape yesterday
-    python daily_scraper.py --today            # Scrape today (for testing)
-    python daily_scraper.py --days-back 3      # Scrape last 3 days
+    python daily_scraper_complete.py
 """
 
 import sys
 from pathlib import Path
-import argparse
 from datetime import datetime, timedelta
+import logging
 import time
-import traceback
+import pandas as pd
 
-# Add project root to path
 project_root = Path(__file__).parent
+sys.path.insert(0, str(project_root / 'src' / 'scraper'))
 sys.path.insert(0, str(project_root))
 
 from src.scraper.app_scraper import EnhancedMultiCommodityScraper
-from src.db.nusantara_db import NusantaraDatabase
-from src.utils.notifications import (
-    send_scrape_success_email,
-    send_scrape_failure_email
+from src.db.nusantara_db import NusantaraDatabaseNormalized
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
 )
+logger = logging.getLogger(__name__)
 
 
-def scrape_daily_data(
-    target_date: str,
-    market_types: list = None
-) -> tuple:
+# CATEGORIES (10 commodities - aggregated)
+CATEGORIES = {
+    'cat_1': {'commodity_id': 1, 'name': 'Beras'},
+    'cat_2': {'commodity_id': 2, 'name': 'Daging Ayam'},
+    'cat_3': {'commodity_id': 3, 'name': 'Daging Sapi'},
+    'cat_4': {'commodity_id': 4, 'name': 'Telur Ayam'},
+    'cat_5': {'commodity_id': 5, 'name': 'Bawang Merah'},
+    'cat_6': {'commodity_id': 6, 'name': 'Bawang Putih'},
+    'cat_7': {'commodity_id': 7, 'name': 'Cabai Merah'},
+    'cat_8': {'commodity_id': 8, 'name': 'Cabai Rawit'},
+    'cat_9': {'commodity_id': 9, 'name': 'Minyak Goreng'},
+    'cat_10': {'commodity_id': 10, 'name': 'Gula Pasir'},
+}
+
+# SUBCATEGORIES (21 subcommodities - quality-level detail)
+SUBCATEGORIES = {
+    'com_1': {'commodity_id': 1, 'name': 'Beras Kualitas Bawah I', 'quality': 'Low'},
+    'com_2': {'commodity_id': 1, 'name': 'Beras Kualitas Bawah II', 'quality': 'Low'},
+    'com_3': {'commodity_id': 1, 'name': 'Beras Kualitas Medium I', 'quality': 'Medium'},
+    'com_4': {'commodity_id': 1, 'name': 'Beras Kualitas Medium II', 'quality': 'Medium'},
+    'com_5': {'commodity_id': 1, 'name': 'Beras Kualitas Super I', 'quality': 'Premium'},
+    'com_6': {'commodity_id': 1, 'name': 'Beras Kualitas Super II', 'quality': 'Premium'},
+    'com_7': {'commodity_id': 2, 'name': 'Daging Ayam Ras Segar', 'quality': 'Standard'},
+    'com_8': {'commodity_id': 3, 'name': 'Daging Sapi Kualitas 1', 'quality': 'Premium'},
+    'com_9': {'commodity_id': 3, 'name': 'Daging Sapi Kualitas 2', 'quality': 'Standard'},
+    'com_10': {'commodity_id': 4, 'name': 'Telur Ayam Ras Segar', 'quality': 'Standard'},
+    'com_11': {'commodity_id': 5, 'name': 'Bawang Merah Ukuran Sedang', 'quality': 'Standard'},
+    'com_12': {'commodity_id': 6, 'name': 'Bawang Putih Ukuran Sedang', 'quality': 'Standard'},
+    'com_13': {'commodity_id': 7, 'name': 'Cabai Merah Besar', 'quality': 'Standard'},
+    'com_14': {'commodity_id': 7, 'name': 'Cabai Merah Keriting', 'quality': 'Standard'},
+    'com_15': {'commodity_id': 8, 'name': 'Cabai Rawit Hijau', 'quality': 'Standard'},
+    'com_16': {'commodity_id': 8, 'name': 'Cabai Rawit Merah', 'quality': 'Standard'},
+    'com_17': {'commodity_id': 9, 'name': 'Minyak Goreng Curah', 'quality': 'Standard'},
+    'com_18': {'commodity_id': 9, 'name': 'Minyak Goreng Kemasan Bermerk 1', 'quality': 'Premium'},
+    'com_19': {'commodity_id': 9, 'name': 'Minyak Goreng Kemasan Bermerk 2', 'quality': 'Premium'},
+    'com_20': {'commodity_id': 10, 'name': 'Gula Pasir Kualitas Premium', 'quality': 'Premium'},
+    'com_21': {'commodity_id': 10, 'name': 'Gula Pasir Lokal', 'quality': 'Standard'},
+}
+
+
+def scrape_complete_daily(days_back: int = 7, market_type_id: int = 1):
     """
-    Scrape data for a specific date
+    Complete daily scraping - BOTH categories AND subcategories
     
     Args:
-        target_date: Date to scrape (YYYY-MM-DD)
-        market_types: List of market type IDs (None = all)
-    
-    Returns:
-        (total_records, execution_time)
+        days_back: Days to look back (7 for overlap)
+        market_type_id: 1=Traditional, 2=Modern, 3=Wholesale, 4=Producer
     """
     
-    print("=" * 70)
-    print("NUSANTARA FOOD WATCH - DAILY SCRAPER")
-    print("=" * 70)
-    print(f"\n📅 Target Date: {target_date}")
-    print(f"⏰ Run Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    start_time = datetime.now()
+    
+    logger.info("="*70)
+    logger.info("📅 COMPLETE DAILY SCRAPER - Categories + Subcategories")
+    logger.info("="*70)
+    logger.info(f"Run time: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+    
+    # Date range
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=days_back)
+    logger.info(f"Period: {start_date.date()} to {end_date.date()}")
+    
+    # Statistics
+    stats = {
+        'start_time': start_time,
+        'categories_scraped': 0,
+        'categories_failed': 0,
+        'subcategories_scraped': 0,
+        'subcategories_failed': 0,
+        'total_inserted': 0,
+        'errors': []
+    }
     
     # Initialize
     scraper = EnhancedMultiCommodityScraper()
-    db = NusantaraDatabase()
+    db = NusantaraDatabaseNormalized()
+    db.connect()
     
-    # Default to all market types
-    if market_types is None:
-        market_types = [1, 2, 3, 4]
+    # Get mappings from database
+    cursor = db.conn.cursor()
     
-    market_names = {
-        1: "Traditional Markets",
-        2: "Modern Markets",
-        3: "Wholesalers",
-        4: "Producers/Farmers"
-    }
+    cursor.execute("SELECT province_id, province_name FROM dim_provinces")
+    province_map = {name: id for id, name in cursor.fetchall()}
     
-    total_inserted = 0
-    start_time = time.time()
+    cursor.execute("SELECT subcategory_id, subcategory_name FROM dim_subcategories")
+    subcategory_map = {name: id for id, name in cursor.fetchall()}
     
-    # Scrape each market type
-    for i, market_id in enumerate(market_types, 1):
-        print(f"\n{'=' * 70}")
-        print(f"[{i}/{len(market_types)}] {market_names.get(market_id, f'Market {market_id}')}")
-        print("=" * 70)
+    cursor.close()
+    
+    # ==================================================================
+    # PART 1: SCRAPE CATEGORIES (cat_1 to cat_10)
+    # ==================================================================
+    
+    logger.info(f"\n{'='*70}")
+    logger.info(f"📦 PART 1: SCRAPING CATEGORIES ({len(CATEGORIES)} items)")
+    logger.info(f"{'='*70}")
+    
+    for idx, (cat_id, cat_info) in enumerate(CATEGORIES.items(), 1):
+        logger.info(f"\n[{idx}/{len(CATEGORIES)}] {cat_info['name']} ({cat_id})")
         
         try:
-            # Scrape
-            print(f"📥 Scraping data...")
-            df = scraper.scrape_all_commodities(
-                start_date=target_date,
-                end_date=target_date,
-                market_type_id=market_id,
-                tipe_laporan=1,  # Daily
-                commodities=None  # All commodities
+            df = scraper.scrape_commodity(
+                commodity_id=cat_id,
+                start_date=start_date.strftime('%Y-%m-%d'),
+                end_date=end_date.strftime('%Y-%m-%d'),
+                market_type_id=market_type_id,
+                tipe_laporan=1  # Daily
             )
             
             if df.empty:
-                print("⚠️ No data returned")
+                logger.info(f"   ⚠️  No data")
+                stats['categories_failed'] += 1
                 continue
             
-            print(f"✓ Retrieved {len(df):,} records")
-            
-            # Prepare for database
-            df['commodity_category'] = df['commodity_id']
-            df['report_type'] = 'daily'
-            df['market_type_id'] = market_id
+            # Add metadata
+            df['db_commodity_id'] = cat_info['commodity_id']
+            df['subcategory_id_mapped'] = None  # Categories don't have subcategory
             
             # Insert
-            print(f"💾 Saving to database...")
-            db.connect()
-            inserted = db.insert_data(df, on_conflict='update')
-            db.close()
+            inserted = insert_to_database(db, df, province_map, subcategory_map, is_category=True)
             
-            print(f"✅ Inserted/Updated {inserted:,} records")
-            total_inserted += inserted
+            stats['categories_scraped'] += 1
+            stats['total_inserted'] += inserted
             
-            # Pause between requests
-            if i < len(market_types):
-                time.sleep(1)
+            logger.info(f"   ✅ {inserted} records inserted")
             
         except Exception as e:
-            print(f"❌ Error: {e}")
-            db.close()
+            logger.error(f"   ❌ Error: {e}")
+            stats['categories_failed'] += 1
+            stats['errors'].append(f"{cat_id}: {e}")
+        
+        time.sleep(1)
+    
+    # ==================================================================
+    # PART 2: SCRAPE SUBCATEGORIES (com_1 to com_21)
+    # ==================================================================
+    
+    logger.info(f"\n{'='*70}")
+    logger.info(f"📦 PART 2: SCRAPING SUBCATEGORIES ({len(SUBCATEGORIES)} items)")
+    logger.info(f"{'='*70}")
+    
+    for idx, (subcom_id, subcom_info) in enumerate(SUBCATEGORIES.items(), 1):
+        logger.info(f"\n[{idx}/{len(SUBCATEGORIES)}] {subcom_info['name']} ({subcom_id})")
+        
+        try:
+            df = scraper.scrape_commodity(
+                commodity_id=subcom_id,
+                start_date=start_date.strftime('%Y-%m-%d'),
+                end_date=end_date.strftime('%Y-%m-%d'),
+                market_type_id=market_type_id,
+                tipe_laporan=1  # Daily
+            )
+            
+            if df.empty:
+                logger.info(f"   ⚠️  No data")
+                stats['subcategories_failed'] += 1
+                continue
+            
+            # Add metadata
+            df['db_commodity_id'] = subcom_info['commodity_id']
+            df['subcommodity_name'] = subcom_info['name']
+            df['subcategory_id_mapped'] = df['subcommodity_name'].map(subcategory_map)
+            
+            # Insert
+            inserted = insert_to_database(db, df, province_map, subcategory_map, is_category=False)
+            
+            stats['subcategories_scraped'] += 1
+            stats['total_inserted'] += inserted
+            
+            logger.info(f"   ✅ {inserted} records inserted")
+            
+        except Exception as e:
+            logger.error(f"   ❌ Error: {e}")
+            stats['subcategories_failed'] += 1
+            stats['errors'].append(f"{subcom_id}: {e}")
+        
+        time.sleep(1)
+    
+    # Final stats
+    stats['end_time'] = datetime.now()
+    stats['duration'] = (stats['end_time'] - stats['start_time']).total_seconds()
+    
+    logger.info(f"\n{'='*70}")
+    logger.info("📊 COMPLETE DAILY SCRAPE FINISHED")
+    logger.info(f"{'='*70}")
+    logger.info(f"Duration: {stats['duration']:.1f} seconds")
+    logger.info(f"\nCategories:")
+    logger.info(f"  ✅ Scraped: {stats['categories_scraped']}/{len(CATEGORIES)}")
+    logger.info(f"  ❌ Failed: {stats['categories_failed']}")
+    logger.info(f"\nSubcategories:")
+    logger.info(f"  ✅ Scraped: {stats['subcategories_scraped']}/{len(SUBCATEGORIES)}")
+    logger.info(f"  ❌ Failed: {stats['subcategories_failed']}")
+    logger.info(f"\n💾 Total inserted: {stats['total_inserted']:,} records")
+    
+    if stats['errors']:
+        logger.warning(f"\n⚠️  Errors ({len(stats['errors'])}):")
+        for err in stats['errors'][:5]:
+            logger.warning(f"   {err}")
+    
+    db.close()
+    
+    return stats
+
+
+def insert_to_database(db, df, province_map, subcategory_map, is_category=False):
+    """
+    Insert data to database
+    
+    Args:
+        db: Database connection
+        df: DataFrame with scraped data
+        province_map: Province name → ID mapping
+        subcategory_map: Subcategory name → ID mapping
+        is_category: True if category-level (NULL subcategory_id)
+    """
+    
+    # Map provinces
+    df['province_id'] = df['provinsi'].map(province_map)
+    
+    # Prepare records
+    records = []
+    for _, row in df.iterrows():
+        if pd.isna(row['province_id']) or pd.isna(row['harga']):
             continue
+        
+        # Subcategory ID (NULL for categories, mapped for subcategories)
+        if is_category:
+            subcategory_id = None
+        else:
+            subcategory_id = row.get('subcategory_id_mapped')
+            if pd.isna(subcategory_id):
+                continue
+        
+        records.append((
+            int(row['province_id']),
+            int(row['db_commodity_id']),
+            int(subcategory_id) if subcategory_id is not None else None,
+            int(row['market_type_id']),
+            row['tanggal'],
+            float(row['harga'])
+        ))
     
-    execution_time = time.time() - start_time
+    if not records:
+        return 0
     
-    # Summary
-    print("\n" + "=" * 70)
-    print("SCRAPING SUMMARY")
-    print("=" * 70)
-    print(f"✅ Total Records: {total_inserted:,}")
-    print(f"⏱️ Execution Time: {int(execution_time // 60)}m {int(execution_time % 60)}s")
-    print("=" * 70)
+    # Insert
+    cursor = db.conn.cursor()
     
-    return total_inserted, execution_time
+    insert_query = """
+        INSERT INTO fact_prices 
+        (province_id, commodity_id, subcategory_id, market_type_id, tanggal, harga)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        ON CONFLICT DO NOTHING
+    """
+    
+    try:
+        cursor.executemany(insert_query, records)
+        db.conn.commit()
+        inserted = cursor.rowcount
+        cursor.close()
+        return inserted
+    
+    except Exception as e:
+        db.conn.rollback()
+        cursor.close()
+        logger.error(f"Insert error: {e}")
+        return 0
+
+
+def send_notification(stats):
+    """Send email notification with results"""
+    
+    try:
+        from src.utils.notifications import send_success_email, send_failure_email
+        
+        total_scraped = stats['categories_scraped'] + stats['subcategories_scraped']
+        total_items = len(CATEGORIES) + len(SUBCATEGORIES)
+        
+        if stats['total_inserted'] > 0:
+            send_success_email(
+                subject=f"✅ Complete Daily Scrape - {stats['total_inserted']:,} records",
+                body=f"""
+Nusantara Food Watch - Complete Daily Scraper Report
+
+Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+Duration: {stats['duration']:.1f} seconds
+
+Categories (Aggregated):
+  ✅ Scraped: {stats['categories_scraped']}/10
+  ❌ Failed: {stats['categories_failed']}
+
+Subcategories (Quality-Level):
+  ✅ Scraped: {stats['subcategories_scraped']}/21
+  ❌ Failed: {stats['subcategories_failed']}
+
+Total: {total_scraped}/{total_items} items
+Database inserted: {stats['total_inserted']:,} records
+
+Status: ✅ SUCCESS
+                """
+            )
+        else:
+            send_failure_email(f"No data inserted. Check logs.")
+        
+        logger.info("✅ Email notification sent")
+    
+    except Exception as e:
+        logger.warning(f"⚠️  Could not send email: {e}")
 
 
 def main():
-    """
-    Main function
-    """
+    """Main execution"""
     
-    parser = argparse.ArgumentParser(
-        description='Daily scraper for Nusantara Food Watch'
-    )
-    
-    parser.add_argument(
-        '--today',
-        action='store_true',
-        help='Scrape today instead of yesterday'
-    )
-    
-    parser.add_argument(
-        '--days-back',
-        type=int,
-        default=1,
-        help='Number of days back to scrape (default: 1 = yesterday)'
-    )
-    
-    parser.add_argument(
-        '--date',
-        type=str,
-        help='Specific date to scrape (YYYY-MM-DD)'
-    )
-    
-    parser.add_argument(
-        '--no-email',
-        action='store_true',
-        help='Skip email notification'
-    )
-    
-    args = parser.parse_args()
-    
-    # Determine target date
-    if args.date:
-        target_date = args.date
-    elif args.today:
-        target_date = datetime.now().strftime('%Y-%m-%d')
-    else:
-        days_back = args.days_back
-        target_date = (datetime.now() - timedelta(days=days_back)).strftime('%Y-%m-%d')
-    
-    # Validate date format
     try:
-        datetime.strptime(target_date, '%Y-%m-%d')
-    except ValueError:
-        print(f"❌ Invalid date format: {target_date}")
-        print("Use YYYY-MM-DD format")
-        sys.exit(1)
+        # Run complete scrape
+        stats = scrape_complete_daily(
+            days_back=7,
+            market_type_id=1
+        )
+        
+        # Send notification
+        send_notification(stats)
+        
+        # Exit
+        if stats['total_inserted'] > 0:
+            logger.info("\n✅ Daily scrape successful!")
+            exit(0)
+        else:
+            logger.warning("\n⚠️ No data inserted!")
+            exit(1)
     
-    # Run scraper
-    try:
-        total_records, execution_time = scrape_daily_data(target_date)
-        
-        # Send success email
-        if not args.no_email and total_records > 0:
-            print("\n📧 Sending success notification...")
-            try:
-                send_scrape_success_email(
-                    records_count=total_records,
-                    execution_time=execution_time
-                )
-                print("✅ Email sent")
-            except Exception as e:
-                print(f"⚠️ Email failed: {e}")
-        
-        # Check if any data was scraped
-        if total_records == 0:
-            print("\n⚠️ WARNING: No records inserted!")
-            print("This might indicate:")
-            print("  - API is down")
-            print("  - Data not available yet for this date")
-            print("  - Network connectivity issue")
-            
-            if not args.no_email:
-                send_scrape_failure_email(
-                    error_message="No records returned from API",
-                    error_type="No Data Warning"
-                )
-            
-            sys.exit(1)
-        
-        print("\n✅ Daily scrape completed successfully!")
-        
-    except KeyboardInterrupt:
-        print("\n\n⚠️ Scraper interrupted")
-        sys.exit(1)
-        
     except Exception as e:
-        error_msg = str(e)
-        tb = traceback.format_exc()
-        
-        print(f"\n❌ Scraper failed: {error_msg}")
-        print("\nFull traceback:")
-        print(tb)
-        
-        # Send failure email
-        if not args.no_email:
-            print("\n📧 Sending failure notification...")
-            try:
-                send_scrape_failure_email(
-                    error_message=error_msg,
-                    error_type=type(e).__name__,
-                    traceback_info=tb
-                )
-                print("✅ Failure email sent")
-            except Exception as email_error:
-                print(f"⚠️ Failed to send email: {email_error}")
-        
-        sys.exit(1)
+        logger.error(f"\n❌ Daily scrape failed: {e}")
+        import traceback
+        traceback.print_exc()
+        exit(1)
 
 
 if __name__ == "__main__":

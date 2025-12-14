@@ -26,7 +26,7 @@ class PIHPSScraper:
     Base URL: https://www.bi.go.id/hargapangan/
     """
     
-    BASE_URL = "https://www.bi.go.id/hargapangan/TabelHarga"
+    BASE_URL = "https://www.bi.go.id/hargapangan/WebSite/TabelHarga"
     
     def __init__(self):
         self.session = requests.Session()
@@ -34,6 +34,7 @@ class PIHPSScraper:
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             'Accept': 'application/json, text/javascript, */*; q=0.01',
             'Accept-Language': 'en-US,en;q=0.9',
+            'X-Requested-With': 'XMLHttpRequest',  # ← ADD THIS LINE!
             'Referer': 'https://www.bi.go.id/hargapangan/TabelHarga/PasarTradisionalKomoditas',
         })
     
@@ -140,6 +141,49 @@ class PIHPSScraper:
         except Exception as e:
             logger.error(f"❌ Gagal ambil data harga: {e}")
             return {"data": []}
+    
+    # Add this method to PIHPSScraper class
+    def debug_api_response(self, commodity_cat_id: str = "cat_1"):
+        """
+        Debug helper to see raw API response
+        """
+        url = f"{self.BASE_URL}/GetGridDataKomoditas"
+        
+        # Recent 3 days
+        end_date = datetime.now().strftime('%Y-%m-%d')
+        start_date = (datetime.now() - timedelta(days=3)).strftime('%Y-%m-%d')
+        
+        params = {
+            'price_type_id': 1,
+            'commodity_cat_id': commodity_cat_id,
+            'province_id': '31',  # DKI Jakarta
+            'regency_id': '',
+            'showKota': 'false',
+            'showPasar': 'false',
+            'tipe_laporan': '1',
+            'start_date': start_date,
+            'end_date': end_date,
+            '_': int(time.time() * 1000)
+        }
+        
+        try:
+            response = self.session.get(url, params=params, timeout=30)
+            response.raise_for_status()
+            data = response.json()
+            
+            # Save to file for inspection
+            with open('api_response_debug.json', 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            
+            print("✅ API response saved to: api_response_debug.json")
+            print("\n📋 Response structure preview:")
+            print(json.dumps(data, indent=2, ensure_ascii=False)[:2000])  # First 2000 chars
+            
+            return data
+            
+        except Exception as e:
+            print(f"❌ Error: {e}")
+            return None
     
     def transform_to_long_format(self, raw_data: Dict) -> pd.DataFrame:
         """
@@ -304,4 +348,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    scraper = PIHPSScraper()
+    
+    # Debug: See raw API response
+    print("\n🔍 DEBUG: Checking API response structure...")
+    scraper.debug_api_response(commodity_cat_id="cat_1")
