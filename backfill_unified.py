@@ -160,6 +160,24 @@ def backfill_unified(
                 logger.info(f"\n[{idx}/10] {cat_info['name']} ({cat_id})")
                 
                 try:
+                    # Check connection
+                    try:
+                        cursor_test = db.conn.cursor()
+                        cursor_test.execute("SELECT 1")
+                        cursor_test.close()
+                    except:
+                        logger.warning("   🔄 Reconnecting...")
+                        db.close()
+                        db = NusantaraDatabaseNormalized()
+                        db.connect()
+                        cursor = db.conn.cursor()
+                        cursor.execute("SELECT province_id, province_name FROM dim_provinces")
+                        province_map = {name: id for id, name in cursor.fetchall()}
+                        cursor.execute("SELECT subcategory_id, subcategory_name FROM dim_subcategories")
+                        subcategory_map = {name: id for id, name in cursor.fetchall()}
+                        cursor.close()
+                        logger.info("   ✅ Reconnected")
+                    
                     df = scraper.scrape_commodity(
                         commodity_id=cat_id,
                         start_date=start_date,
@@ -202,6 +220,26 @@ def backfill_unified(
                 logger.info(f"\n[{idx}/21] {subcom_info['name']} ({subcom_id})")
                 
                 try:
+                    # Check connection before each scrape
+                    try:
+                        cursor_test = db.conn.cursor()
+                        cursor_test.execute("SELECT 1")
+                        cursor_test.close()
+                    except:
+                        logger.warning("   🔄 Database connection lost, reconnecting...")
+                        db.close()
+                        db = NusantaraDatabaseNormalized()
+                        db.connect()
+                        
+                        # Reload mappings
+                        cursor = db.conn.cursor()
+                        cursor.execute("SELECT province_id, province_name FROM dim_provinces")
+                        province_map = {name: id for id, name in cursor.fetchall()}
+                        cursor.execute("SELECT subcategory_id, subcategory_name FROM dim_subcategories")
+                        subcategory_map = {name: id for id, name in cursor.fetchall()}
+                        cursor.close()
+                        logger.info("   ✅ Reconnected successfully")
+                    
                     df = scraper.scrape_commodity(
                         commodity_id=subcom_id,
                         start_date=start_date,
@@ -264,21 +302,71 @@ def insert_to_db(db, df, province_map, subcategory_map, is_category=False):
     
     import pandas as pd
     
+    logger.info(f"   🔍 DEBUG: DataFrame has {len(df)} rows")
+    logger.info(f"   🔍 DEBUG: Columns: {list(df.columns)}")
+    logger.info(f"   🔍 DEBUG: is_category={is_category}")
+    
+    # Map province names to IDs
     df['province_id'] = df['provinsi'].map(province_map)
     
+    # Debug: Check province mapping
+    unmapped_provinces = df[df['province_id'].isna()]['provinsi'].unique()
+    if len(unmapped_provinces) > 0:
+        logger.warning(f"   ⚠️  Unmapped provinces: {unmapped_provinces[:5]}")
+    
     records = []
-    for _, row in df.iterrows():
-        if pd.isna(row['province_id']) or pd.isna(row['harga']):
+    skipped = 0
+    skip_reasons = {'no_province': 0, 'no_price': 0, 'no_subcat_name': 0, 'unmapped_subcat': 0}
+    
+    for idx, row in df.iterrows():
+        # Skip if missing required data
+        if pd.isna(row['province_id']):
+            skip_reasons['no_province'] += 1
+            skipped += 1
             continue
         
-        # Subcategory ID
+        if pd.isna(row['harga']):
+            skip_reasons['no_price'] += 1
+            skipped += 1
+            continue
+        
+        # Determine subcategory ID
         if is_category:
+            # Categories don't have subcategory
             subcategory_id = None
         else:
-            subcat_id = subcategory_map.get(row.get('subcommodity_name'))
-            if pd.isna(subcat_id):
+            # Subcategories: get ID from name
+            # Use bracket notation for pandas Series, not .get()
+            if 'subcommodity_name' not in df.columns:
+                logger.error(f"   ❌ Column 'subcommodity_name' not in DataFrame!")
+                logger.error(f"   Available columns: {list(df.columns)}")
+                skip_reasons['no_subcat_name'] += len(df)
+                break
+            
+            subcat_name = row['subcommodity_name']
+            
+            if idx < 3:  # Debug first 3 rows
+                logger.info(f"   🔍 Row {idx}: subcommodity_name='{subcat_name}'")
+            
+            if pd.isna(subcat_name) or subcat_name is None or subcat_name == '':
+                if idx < 3:
+                    logger.warning(f"   ⚠️  Row {idx}: Missing subcommodity_name")
+                skip_reasons['no_subcat_name'] += 1
+                skipped += 1
                 continue
-            subcategory_id = subcat_id
+            
+            subcategory_id = subcategory_map.get(str(subcat_name))  # Convert to string
+            
+            if idx < 3:
+                logger.info(f"   🔍 Row {idx}: Mapped to subcategory_id={subcategory_id}")
+            
+            if subcategory_id is None:
+                if idx < 3:
+                    logger.warning(f"   ⚠️  Row {idx}: Unmapped subcategory '{subcat_name}'")
+                    logger.info(f"   🔍 Available subcategories: {list(subcategory_map.keys())[:5]}")
+                skip_reasons['unmapped_subcat'] += 1
+                skipped += 1
+                continue
         
         records.append((
             int(row['province_id']),
@@ -289,7 +377,16 @@ def insert_to_db(db, df, province_map, subcategory_map, is_category=False):
             float(row['harga'])
         ))
     
+    logger.info(f"   📊 Prepared {len(records)} records for insert")
+    
+    if skipped > 0:
+        logger.info(f"   ⚠️  Skipped {skipped} records:")
+        for reason, count in skip_reasons.items():
+            if count > 0:
+                logger.info(f"      - {reason}: {count}")
+    
     if not records:
+        logger.warning(f"   ❌ No valid records to insert!")
         return 0
     
     cursor = db.conn.cursor()
@@ -301,16 +398,33 @@ def insert_to_db(db, df, province_map, subcategory_map, is_category=False):
         ON CONFLICT DO NOTHING
     """
     
+    # Process in batches to avoid timeout
+    batch_size = 500
+    total_inserted = 0
+    
     try:
-        cursor.executemany(insert_query, records)
-        db.conn.commit()
-        inserted = cursor.rowcount
+        for i in range(0, len(records), batch_size):
+            batch = records[i:i+batch_size]
+            
+            cursor.executemany(insert_query, batch)
+            db.conn.commit()
+            total_inserted += cursor.rowcount
+            
+            if (i + batch_size) % 2000 == 0:  # Progress every 2000 records
+                logger.info(f"      Progress: {i+batch_size}/{len(records)} processed...")
+        
         cursor.close()
-        return inserted
+        
+        logger.info(f"   💾 Database insert: {total_inserted} rows affected")
+        
+        return total_inserted
+        
     except Exception as e:
         db.conn.rollback()
         cursor.close()
-        logger.error(f"Insert error: {e}")
+        logger.error(f"   ❌ Insert error: {e}")
+        import traceback
+        traceback.print_exc()
         return 0
 
 
