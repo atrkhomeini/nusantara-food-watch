@@ -115,73 +115,75 @@ def send_email_alert(
         return False
 
 
-def send_scrape_success_email(
-    records_count: int,
-    commodities_count: int = 10,
-    provinces_count: int = 35,
-    market_types: int = 4,
-    execution_time: Optional[float] = None
-) -> bool:
+def send_scrape_success_email(records_count: int = 0) -> None:
     """
-    Send success notification after successful scrape
+    Send success notification email after scraping
     
     Args:
         records_count: Number of records inserted
-        commodities_count: Number of commodities scraped
-        provinces_count: Number of provinces
-        market_types: Number of market types
-        execution_time: Execution time in seconds (optional)
-    
-    Returns:
-        True if sent successfully
     """
     
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    import os
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    from datetime import datetime
     
-    # Plain text version
+    # Get email credentials from environment
+    email_from = os.getenv('EMAIL_ADDRESS')
+    email_to = os.getenv('ALERT_EMAIL')
+    email_password = os.getenv('EMAIL_APP_PASSWORD')
+    
+    if not all([email_from, email_to, email_password]):
+        print("⚠️  Email not configured, skipping notification")
+        return
+    
+    # Create email
+    msg = MIMEMultipart()
+    msg['From'] = email_from
+    msg['To'] = email_to
+    msg['Subject'] = f"✅ Daily Scrape Success - {records_count:,} records"  # ✅ FIXED: Removed 's'
+    
+    # Email body - FIXED: All format specs corrected
     body = f"""
-Nusantara Food Watch - Scraper Success Report
-{'=' * 60}
+Nusantara Food Watch - Daily Scrape Report
+==========================================
 
-Timestamp: {timestamp}
+Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
-SUMMARY
--------
-Status: ✅ Success
-Records Inserted: {records_count:,}
-Commodities: {commodities_count}
-Provinces: {provinces_count}
-Market Types: {market_types}
-"""
-    
-    if execution_time:
-        minutes = int(execution_time // 60)
-        seconds = int(execution_time % 60)
-        body += f"Execution Time: {minutes}m {seconds}s\n"
-    
-    body += """
+Status: ✅ SUCCESS
 
-DATA COVERAGE
--------------
-- Traditional Markets (Pasar Tradisional)
-- Modern Markets/Supermarkets
-- Wholesalers (Pedagang Besar)
-- Producers/Farmers (Produsen)
+Results:
+--------
+Records inserted: {records_count:,}  # ✅ FIXED: No 's' here
+Database updated successfully
 
-NEXT STEPS
-----------
-✓ Data available in database
-✓ Ready for analysis
-✓ Dashboard will auto-update
+Next Steps:
+-----------
+- Data is now available in dashboard
+- Automated analysis running
+- Check dashboard for latest prices
 
 ---
-This is an automated message from Nusantara Food Watch scraper.
-Project: github.com/atrkhomeini/nusantara-food-watch
+Automated by Nusantara Food Watch
+GitHub Actions Daily Scraper
 """
     
-    subject = f"Daily Scrape Success - {records_count:,} records"
+    msg.attach(MIMEText(body, 'plain'))
     
-    return send_email_alert(subject, body, is_html=False, is_error=False)
+    # Send email
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(email_from, email_password)
+        server.send_message(msg)
+        server.quit()
+        
+        print("✅ Success email sent")
+    
+    except Exception as e:
+        print(f"❌ Failed to send email: {e}")
+
 
 
 def send_scrape_failure_email(
@@ -349,9 +351,15 @@ Test completed successfully.
 
 
 # Convenience functions for backward compatibility
-def send_success_email(records_count: int = 0) -> bool:
-    """Quick success email (for GitHub Actions)"""
-    return send_scrape_success_email(records_count or 1000)
+def send_success_email(message: str = "Operation completed successfully") -> None:
+    """
+    Generic success email - calls send_scrape_success_email
+    
+    Args:
+        message: Custom message (optional)
+    """
+    # For now, just use default behavior
+    send_scrape_success_email(records_count=0)
 
 
 def send_failure_email(error_message: str) -> bool:
