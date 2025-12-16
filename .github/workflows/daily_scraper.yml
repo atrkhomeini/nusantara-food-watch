@@ -43,7 +43,7 @@ jobs:
         ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
       run: |
         echo "Starting daily scraper..."
-        python daily_scraper_complete.py
+        python daily_scraper.py
       continue-on-error: true  # Continue to notification even if scraper fails
     
     # Step 5: Send notification on success
