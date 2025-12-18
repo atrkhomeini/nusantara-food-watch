@@ -129,3 +129,4 @@ autopep8==2.0.4               # Auto PEP8 formatter
 # Email Configuration:
 #   Uses Python's built-in smtplib and email libraries
 #   No additional packages needed for Gmail SMTP
+reflex==0.8.22
