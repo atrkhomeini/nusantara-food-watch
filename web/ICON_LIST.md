@@ -1,612 +1,419 @@
-# 🚀 NUSANTARA FOOD WATCH - DEVELOPMENT GUIDELINES (UPDATED)
-# Updated for: New project structure + Yellow-Olive dark theme + Icon files
+# 🖼️ NUSANTARA FOOD WATCH - ICON LIST
 
-## **📁 PROJECT STRUCTURE**
+Complete list of required icons for the dashboard.
+
+## **📁 Icon Directory Structure**
 
 ```
-nusantara_food/
-├── .gitignore
-├── README.md
-├── requirements.txt
-├── main.py                     # Main entry point
-├── backfill_unified.py        # Historical data backfill
-├── daily_scraper.py           # Daily scraper
+web/assets/icons/
+├── commodities/          # Food item icons
+│   ├── rice.png
+│   ├── chicken.png
+│   ├── beef.png
+│   ├── egg.png
+│   ├── onion-red.png
+│   ├── garlic.png
+│   ├── chili-red.png
+│   ├── chili-green.png
+│   ├── oil.png
+│   └── sugar.png
 │
-├── .github/
-│   └── workflows/
-│       └── daily_scraper.yml  # GitHub Actions automation
+├── roles/                # User role icons
+│   ├── consumer.png
+│   ├── trader.png
+│   ├── government.png
+│   └── researcher.png
 │
-├── data/                       # Data storage (gitignored)
-│   ├── raw/                   # Raw scraped data
-│   ├── interim/               # Intermediate processing
-│   └── processed/             # Analysis-ready data
+├── status/               # Status indicators
+│   ├── arrow-up.png
+│   ├── arrow-down.png
+│   ├── arrow-right.png
+│   ├── alert.png
+│   ├── warning.png
+│   ├── success.png
+│   └── info.png
 │
-├── dump/                       # Temporary files (gitignored)
-│
-├── notebooks/                  # Jupyter notebooks for analysis
-│   ├── 01_data_extraction.ipynb
-│   ├── 02_data_cleaning.ipynb
-│   ├── 03_exploratory_analysis.ipynb
-│   ├── 04_visualization.ipynb
-│   ├── 05_forecasting.ipynb
-│   └── COMPLETE_DOCUMENTATION.md
-│
-├── reports/                    # Generated reports
-│   └── figures/               # Saved visualizations
-│
-├── src/                        # Source code modules
-│   ├── __init__.py
-│   │
-│   ├── db/                    # Database modules
-│   │   ├── __init__.py
-│   │   ├── nusantara_db.py   # Database connection & queries
-│   │   └── normalization/    # Migration scripts
-│   │
-│   ├── scraper/               # Scraping modules
-│   │   ├── __init__.py
-│   │   ├── pihps_scraper.py  # Core scraper
-│   │   └── debug/            # Debug utilities
-│   │
-│   ├── data_analysis/         # Analysis modules
-│   │   ├── __init__.py
-│   │   ├── cleaning.py       # Data cleaning
-│   │   ├── forecast.py       # Forecasting models
-│   │   └── visualize.py      # Visualization helpers
-│   │
-│   ├── models/                # ML models (future)
-│   │   └── __init__.py
-│   │
-│   └── utils/                 # Utility modules
-│       ├── __init__.py
-│       └── notifications.py  # Email notifications
-│
-├── analysis/                   # ⭐ NEW: Analysis scripts
-│   ├── processing/            # Data processing scripts
-│   │   └── *.py
-│   └── queries/               # SQL queries
-│       └── *.sql
-│
-└── web/                        # ⭐ Dashboard application
-    ├── main.py                # Dash app entry point
-    ├── index.py               # URL routing
-    ├── design_system.py       # ⭐ SINGLE SOURCE OF TRUTH
-    ├── components.py          # ⭐ Reusable components
-    ├── README.md
-    ├── requirements.txt
-    │
-    ├── assets/                # Static assets
-    │   ├── style/            # CSS files
-    │   │   └── custom.css
-    │   └── icons/            # ⭐ Icon files (PNG/SVG)
-    │       ├── rice.png
-    │       ├── chicken.png
-    │       ├── arrow-up.png
-    │       └── ... (see ICON_LIST.md)
-    │
-    ├── pages/                 # Page modules
-    │   ├── __init__.py
-    │   ├── landing.py         # Landing page
-    │   ├── home_consumer.py   # Consumer homepage
-    │   ├── home_government.py # Government homepage
-    │   ├── home_trader.py     # Trader homepage
-    │   ├── home_researcher.py # Researcher homepage
-    │   ├── all_user.py        # Shared pages
-    │   └── about_page.py      # About page
-    │
-    └── utils/                 # Dashboard utilities
-        ├── __init__.py
-        ├── config.py          # Configuration
-        └── helpers.py         # Helper functions
+└── ui/                   # UI elements
+    ├── menu.png
+    ├── close.png
+    ├── search.png
+    ├── filter.png
+    ├── download.png
+    ├── upload.png
+    ├── calendar.png
+    ├── location.png
+    ├── settings.png
+    ├── user.png
+    └── logout.png
 ```
 
 ---
 
-## **🎨 DESIGN SYSTEM (Yellow-Olive Dark Theme)**
+## **📋 COMPLETE ICON LIST**
 
-### **Color Palette:**
+### **1. COMMODITIES (10 icons)**
 
-```python
-# Primary Colors
-'primary': '#FDDA24'           # Bright yellow
-'primary_dark': '#B59E25'      # Dark yellow
+| Icon Name | File Name | Description | Search Keywords |
+|-----------|-----------|-------------|-----------------|
+| Rice | `rice.png` | Rice grain or bowl of rice | rice, grain, food, staple |
+| Chicken | `chicken.png` | Chicken meat or whole chicken | chicken, poultry, meat |
+| Beef | `beef.png` | Beef meat or cow | beef, meat, steak, cow |
+| Egg | `egg.png` | Egg (whole or broken) | egg, protein, food |
+| Red Onion | `onion-red.png` | Red/purple onion | onion, vegetable, red onion |
+| Garlic | `garlic.png` | Garlic bulb or cloves | garlic, spice, vegetable |
+| Red Chili | `chili-red.png` | Red chili pepper | chili, pepper, spicy, red |
+| Green Chili | `chili-green.png` | Green chili pepper (rawit) | chili, pepper, green, rawit |
+| Cooking Oil | `oil.png` | Oil bottle or drop | oil, cooking, bottle, liquid |
+| Sugar | `sugar.png` | Sugar cubes or granulated | sugar, sweet, cube, granulated |
 
-# Status Colors
-'success': '#8CB525'           # Olive green (good)
-'warning': '#F8A22D'           # Orange (watch)
-'danger': '#EF3340'            # Red (alert)
+**Style:** Flat, simple, recognizable food icons
+**Colors:** Can be colored or monochrome (yellow-olive theme preferred)
 
-# Backgrounds (Dark Theme)
-'bg_main': '#1A1A1A'           # Main background
-'bg_card': '#262626'           # Card background
-'bg_hover': '#333333'          # Hover state
+---
 
-# Text (Light on Dark)
-'text_primary': '#FFFFFF'      # White text
-'text_secondary': '#E5E5E5'    # Gray text
+### **2. USER ROLES (4 icons)**
+
+| Icon Name | File Name | Description | Search Keywords |
+|-----------|-----------|-------------|-----------------|
+| Consumer | `consumer.png` | Shopping cart or person shopping | consumer, shopper, cart, buyer |
+| Trader | `trader.png` | Business person or briefcase | trader, business, briefcase |
+| Government | `government.png` | Building or official emblem | government, building, official |
+| Researcher | `researcher.png` | Magnifying glass or microscope | researcher, search, science |
+
+**Style:** Professional, simple icons
+**Colors:** Monochrome or subtle colors
+
+---
+
+### **3. STATUS INDICATORS (7 icons)**
+
+| Icon Name | File Name | Description | Search Keywords |
+|-----------|-----------|-------------|-----------------|
+| Up Arrow | `arrow-up.png` | Up arrow (price increase) | arrow, up, increase, rise |
+| Down Arrow | `arrow-down.png` | Down arrow (price decrease) | arrow, down, decrease, fall |
+| Right Arrow | `arrow-right.png` | Right arrow (stable) | arrow, right, stable, neutral |
+| Alert | `alert.png` | Alert/danger icon | alert, danger, warning, exclamation |
+| Warning | `warning.png` | Warning triangle | warning, caution, triangle |
+| Success | `success.png` | Checkmark or success icon | success, check, checkmark, done |
+| Info | `info.png` | Information icon (i) | info, information, help |
+
+**Style:** Simple, clear symbols
+**Colors:** Match status colors (red for alert, green for success, etc.)
+
+---
+
+### **4. UI ELEMENTS (11 icons)**
+
+| Icon Name | File Name | Description | Search Keywords |
+|-----------|-----------|-------------|-----------------|
+| Menu | `menu.png` | Hamburger menu (3 lines) | menu, hamburger, navigation |
+| Close | `close.png` | X or close icon | close, exit, x, cancel |
+| Search | `search.png` | Magnifying glass | search, find, magnifier |
+| Filter | `filter.png` | Filter funnel | filter, funnel, sort |
+| Download | `download.png` | Download arrow | download, save, export |
+| Upload | `upload.png` | Upload arrow | upload, import, add |
+| Calendar | `calendar.png` | Calendar icon | calendar, date, schedule |
+| Location | `location.png` | Pin or location marker | location, pin, map, place |
+| Settings | `settings.png` | Gear or cog | settings, gear, config |
+| User | `user.png` | User profile | user, profile, person |
+| Logout | `logout.png` | Logout/exit icon | logout, exit, signout |
+
+**Style:** Standard UI icons
+**Colors:** Monochrome (white/yellow for dark theme)
+
+---
+
+## **📐 ICON SPECIFICATIONS**
+
+### **Size:**
+- Original: 256x256px or 512x512px
+- Usage in code: Scale to 16px, 24px, 32px, 48px as needed
+
+### **Format:**
+- **PNG:** Recommended (transparent background)
+- **SVG:** Also acceptable (scalable)
+
+### **Background:**
+- **Transparent** (PNG with alpha channel or SVG)
+
+### **Style Guide:**
+- **Flat design** (no 3D effects)
+- **Modern & minimal**
+- **Consistent stroke weight** across all icons
+- **Clear at small sizes**
+
+### **Color Options:**
+
+**Option 1: Monochrome (Recommended)**
+- All icons in single color (#FFFFFF or #FDDA24)
+- Easy to recolor in code
+- Most flexible
+
+**Option 2: Themed Colors**
+- Use yellow-olive theme colors
+- Commodities can have natural colors (red chili = red, etc.)
+- Status icons match their status color
+
+---
+
+## **🔍 WHERE TO FIND ICONS**
+
+### **Free Resources:**
+
+1. **Flaticon** (https://www.flaticon.com/)
+   - Huge collection
+   - Free with attribution
+   - Premium = no attribution
+   - Search: "food icons flat", "status icons"
+
+2. **Noun Project** (https://thenounproject.com/)
+   - Professional icons
+   - Free with attribution
+   - Consistent style sets
+
+3. **Font Awesome** (https://fontawesome.com/)
+   - Export as PNG (screenshot + transparent bg)
+   - Comprehensive UI icons
+   - Free tier available
+
+4. **Material Icons** (https://fonts.google.com/icons)
+   - Google's icon set
+   - Download as PNG/SVG
+   - Consistent design language
+
+5. **Heroicons** (https://heroicons.com/)
+   - Free MIT license
+   - Modern, clean design
+   - Available as SVG
+
+---
+
+## **📥 DOWNLOAD CHECKLIST**
+
+### **Before Downloading:**
+```
+[ ] Choose consistent icon set (all from same source/style)
+[ ] Check license (free for commercial use?)
+[ ] Decide on monochrome vs colored
+[ ] Determine target size (256px or 512px)
 ```
 
-### **Typography (Google Fonts):**
-
-```python
-# Font Families
-'family': 'Inter'              # Body text
-'family_display': 'Poppins'    # Headings
-'family_mono': 'Fira Code'     # Code
-
-# Import in HTML:
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+### **After Downloading:**
+```
+[ ] Rename to match ICON_LIST.md naming
+[ ] Ensure transparent background
+[ ] Verify size (256x256 or 512x512)
+[ ] Place in correct subdirectory
+[ ] Test in dashboard (visible on dark background?)
 ```
 
-### **Icons (File-based):**
+---
+
+## **🎨 RECOMMENDED ICON SETS**
+
+### **Option 1: Flaticon "Essential Collection"**
+- Style: Flat, modern
+- Colors: Monochrome
+- Size: 512px
+- License: Free with attribution
+
+**Search queries:**
+- "food icons collection"
+- "business icons set"
+- "ui icons minimal"
+
+### **Option 2: Noun Project "Interface Icons"**
+- Style: Outlined, clean
+- Colors: Monochrome
+- Size: 256px
+- License: Free with attribution
+
+### **Option 3: Material Icons + Custom Food Icons**
+- UI icons: Material Icons
+- Food icons: Custom from Flaticon
+- Mix and match for best result
+
+---
+
+## **🔧 ICON PROCESSING TIPS**
+
+### **Make Icons Work on Dark Background:**
+
+If icons are black/dark and invisible on dark background:
+
+**Method 1: Invert Colors (Photoshop/GIMP)**
+```
+1. Open icon in editor
+2. Image → Adjustments → Invert
+3. Black becomes white
+4. Export as PNG
+```
+
+**Method 2: Add White Fill**
+```
+1. Open SVG in editor
+2. Select all paths
+3. Fill: #FFFFFF
+4. Export as PNG
+```
+
+**Method 3: CSS Filter (in code)**
+```python
+html.Img(
+    src='/assets/icons/icon.png',
+    style={
+        'filter': 'invert(1)',  # Black → White
+        'width': '32px'
+    }
+)
+```
+
+---
+
+## **📝 ICON USAGE EXAMPLES**
+
+### **In Components:**
 
 ```python
-# Location: web/assets/icons/
-# Format: PNG or SVG
-
-# Usage:
 from web.design_system import get_icon_path
 
-icon_path = get_icon_path('commodities', 'Beras')
-# Returns: '/assets/icons/rice.png'
-
-html.Img(src=icon_path, style={'width': '32px'})
-```
-
----
-
-## **📋 CODING STANDARDS**
-
-### **1. Always Import Design System**
-
-```python
-# ✅ CORRECT
-from web.design_system import COLORS, FONTS, SPACING
-from web.components import create_stat_card, create_card
-
-def my_component():
-    return html.Div(
-        "Hello",
-        style={'color': COLORS['primary']}  # Yellow
-    )
-
-# ❌ WRONG
-def my_component():
-    return html.Div(
-        "Hello",
-        style={'color': '#FDDA24'}  # Hardcoded!
-    )
-```
-
----
-
-### **2. Use File-based Icons**
-
-```python
-# ✅ CORRECT
-from web.design_system import get_icon_path
-
-icon = html.Img(
+# Commodity icon
+rice_icon = html.Img(
     src=get_icon_path('commodities', 'Beras'),
-    style={'width': '32px', 'height': '32px'}
+    style={'width': '48px', 'height': '48px'}
 )
 
-# ❌ WRONG
-icon = html.Span('🍚')  # Emoji not supported anymore
-```
-
----
-
-### **3. Dark Theme Styling**
-
-```python
-# ✅ CORRECT - Light text on dark background
-html.Div(
-    "Content",
-    style={
-        'backgroundColor': COLORS['bg_card'],  # Dark
-        'color': COLORS['text_primary'],       # Light text
-    }
+# Status icon
+up_arrow = html.Img(
+    src=get_icon_path('status', 'up'),
+    style={'width': '16px', 'height': '16px'}
 )
 
-# ❌ WRONG - Dark text on dark background
-html.Div(
-    "Content",
-    style={
-        'backgroundColor': COLORS['bg_card'],
-        'color': '#000000',  # Can't read!
-    }
+# UI icon
+menu_icon = html.Img(
+    src=get_icon_path('ui', 'menu'),
+    style={'width': '24px', 'height': '24px'}
 )
 ```
 
 ---
 
-### **4. File Structure for Pages**
+## **✅ VERIFICATION CHECKLIST**
 
-Every page file should follow this structure:
+After downloading all icons:
 
-```python
-"""
-Page: Consumer Homepage
-Author: [Your Name]
-Description: Homepage for consumer role with forecast
-Updated: YYYY-MM-DD
-"""
+```
+Commodities (10):
+[ ] rice.png
+[ ] chicken.png
+[ ] beef.png
+[ ] egg.png
+[ ] onion-red.png
+[ ] garlic.png
+[ ] chili-red.png
+[ ] chili-green.png
+[ ] oil.png
+[ ] sugar.png
 
-from dash import html, dcc, Input, Output, callback
-from web.design_system import COLORS, FONTS, SPACING
-from web.components import create_stat_card, create_card
-from analysis.processing.price_data import get_current_prices  # ⭐ NEW path
+User Roles (4):
+[ ] consumer.png
+[ ] trader.png
+[ ] government.png
+[ ] researcher.png
 
+Status (7):
+[ ] arrow-up.png
+[ ] arrow-down.png
+[ ] arrow-right.png
+[ ] alert.png
+[ ] warning.png
+[ ] success.png
+[ ] info.png
 
-# ============================================================================
-# 1. LAYOUT DEFINITION
-# ============================================================================
+UI Elements (11):
+[ ] menu.png
+[ ] close.png
+[ ] search.png
+[ ] filter.png
+[ ] download.png
+[ ] upload.png
+[ ] calendar.png
+[ ] location.png
+[ ] settings.png
+[ ] user.png
+[ ] logout.png
 
-def layout():
-    """Main layout"""
-    return html.Div([
-        create_header(),
-        create_content(),
-    ], style={'backgroundColor': COLORS['bg_main']})  # Dark background
-
-
-# ============================================================================
-# 2. COMPONENT FUNCTIONS
-# ============================================================================
-
-def create_header():
-    """Create page header"""
-    return html.Div(
-        html.H1("Consumer Dashboard", style=COMPONENT_STYLES['heading_1']),
-        style={'padding': SPACING['xl']}
-    )
-
-
-def create_content():
-    """Create main content"""
-    return html.Div([
-        create_stat_card(
-            label="Harga Beras",
-            value="Rp 12,500",
-            change_percent=2.5,
-            icon_name="Beras",           # ⭐ Use icon name
-            icon_category="commodities"
-        ),
-    ])
-
-
-# ============================================================================
-# 3. CALLBACKS
-# ============================================================================
-
-@callback(
-    Output('chart', 'figure'),
-    Input('dropdown', 'value')
-)
-def update_chart(value):
-    """Update chart callback"""
-    pass
+Total: 32 icons ✅
 ```
 
 ---
 
-## **🖼️ ICON MANAGEMENT**
+## **🚀 QUICK START**
 
-### **Required Icons (Place in `web/assets/icons/`):**
+### **Fast Track (30 minutes):**
 
-See `ICON_LIST.md` for complete list.
+1. Go to Flaticon.com
+2. Search "food icons collection" → Download set
+3. Search "ui icons minimal" → Download set
+4. Rename files to match this list
+5. Place in `web/assets/icons/` subdirectories
+6. Test in dashboard
 
-**Categories:**
-1. **Commodities** (rice.png, chicken.png, etc.)
-2. **User Roles** (role-consumer.png, role-trader.png, etc.)
-3. **Status** (arrow-up.png, arrow-down.png, alert.png, etc.)
-4. **UI** (menu.png, search.png, download.png, etc.)
+### **Quality Track (1-2 hours):**
 
-**Icon Guidelines:**
-- Format: PNG or SVG
-- Size: 256x256px or 512x512px
-- Style: Flat, modern, consistent
-- Colors: Monochrome or yellow-olive theme
-- Background: Transparent
-
-**Where to find:**
-- [Flaticon](https://www.flaticon.com/)
-- [Noun Project](https://thenounproject.com/)
-- [Font Awesome](https://fontawesome.com/) (export as PNG)
-- [Material Icons](https://fonts.google.com/icons)
+1. Browse multiple sources
+2. Select consistent style
+3. Download highest resolution
+4. Process for dark theme
+5. Optimize file sizes
+6. Test thoroughly
 
 ---
 
-## **🔄 GIT WORKFLOW**
+## **💡 PRO TIPS**
 
-### **Branch Naming:**
+**Tip 1:** Download extra icons while you're at it!
+- You might need more later
+- Easier to download from same set
 
-```
-feature/consumer-homepage       # New feature
-fix/chart-dark-theme           # Bug fix
-refactor/update-icons          # Code refactor
-docs/update-readme             # Documentation
-style/apply-yellow-theme       # Styling
-```
+**Tip 2:** Keep source files
+- Save original high-res files
+- Easier to resize later
 
-### **Commit Messages:**
+**Tip 3:** Document sources
+- Note where each icon came from
+- Important for attribution
 
-```bash
-feat: add price forecast to consumer homepage
-fix: correct icon paths in stat cards
-refactor: migrate to file-based icons
-docs: update icon list
-style: apply yellow-olive dark theme
-```
+**Tip 4:** Test visibility
+- View on dark background
+- Different screen brightnesses
+- Various zoom levels
 
 ---
 
-## **📊 DATA ANALYSIS WORKFLOW**
+## **📄 LICENSE NOTES**
 
-### **Processing Scripts (analysis/processing/):**
+### **If using free icons:**
+- Check license requirements
+- Provide attribution if needed
+- Don't redistribute icon packs
 
-```python
-# analysis/processing/price_forecast.py
-
-def calculate_forecast(commodity_id, days=7):
-    """
-    Calculate price forecast
-    
-    Args:
-        commodity_id (int): Commodity ID
-        days (int): Forecast days
-        
-    Returns:
-        pd.DataFrame: Forecast data
-    """
-    # Query from database
-    # Apply forecasting model
-    # Return results
-    pass
+### **Example attribution:**
 ```
-
-### **SQL Queries (analysis/queries/):**
-
-```sql
--- analysis/queries/get_latest_prices.sql
-
-SELECT 
-    c.commodity_name,
-    p.province_name,
-    fp.harga,
-    fp.tanggal
-FROM fact_prices fp
-JOIN dim_commodities c ON fp.commodity_id = c.commodity_id
-JOIN dim_provinces p ON fp.province_id = p.province_id
-WHERE fp.tanggal = (SELECT MAX(tanggal) FROM fact_prices)
-ORDER BY c.commodity_name, p.province_name;
-```
-
-### **Usage in Dashboard:**
-
-```python
-# web/pages/home_consumer.py
-
-from analysis.processing.price_forecast import calculate_forecast
-from analysis.queries import get_latest_prices  # Load SQL query
-
-@callback(...)
-def update_forecast(...):
-    df = calculate_forecast(commodity_id, days=7)
-    return create_line_chart(df, 'date', 'price')
+Icons by Flaticon (www.flaticon.com)
+- Food icons by Author Name
+- UI icons by Author Name
 ```
 
 ---
 
-## **🚀 DEVELOPMENT WORKFLOW**
+## **🎉 YOU'RE DONE!**
 
-### **Step 1: Setup Environment**
+After completing this checklist:
+- ✅ All 32 icons downloaded
+- ✅ Proper naming convention
+- ✅ Organized in subdirectories
+- ✅ Visible on dark background
+- ✅ Tested in dashboard
 
-```bash
-# Clone repo
-git clone <repo-url>
-cd nusantara_food
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-pip install -r web/requirements.txt
-
-# Download icons (see ICON_LIST.md)
-# Place in web/assets/icons/
-```
-
----
-
-### **Step 2: Development Cycle**
-
-```bash
-# 1. Create feature branch
-git checkout -b feature/consumer-homepage
-
-# 2. Make changes
-# - Follow design_system.py
-# - Use components.py
-# - Use file-based icons
-
-# 3. Test dashboard
-cd web
-python main.py
-# Open http://localhost:8050
-
-# 4. Test with dark theme
-# Verify contrast, icon visibility
-
-# 5. Commit and push
-git add .
-git commit -m "feat: add consumer homepage"
-git push origin feature/consumer-homepage
-
-# 6. Create Pull Request
-```
-
----
-
-## **✅ PRE-COMMIT CHECKLIST**
-
-Before committing, verify:
-
-```
-[ ] All colors from design_system.py (no hardcoded #FDDA24)
-[ ] All icons from web/assets/icons/ (no emoji text)
-[ ] Dark theme: Light text on dark background
-[ ] Google Fonts loaded in HTML
-[ ] No console.log or print statements
-[ ] Tested in dark mode
-[ ] Icons visible and properly sized
-[ ] Tested locally (app runs without errors)
-[ ] No merge conflicts
-```
-
----
-
-## **🎨 DARK THEME BEST PRACTICES**
-
-### **1. Text Contrast:**
-
-```python
-# ✅ CORRECT
-html.Div(
-    "Text",
-    style={
-        'backgroundColor': COLORS['bg_main'],    # #1A1A1A
-        'color': COLORS['text_primary']          # #FFFFFF
-    }
-)
-
-# ❌ WRONG - Low contrast
-html.Div(
-    "Text",
-    style={
-        'backgroundColor': COLORS['bg_main'],    # #1A1A1A
-        'color': COLORS['text_secondary']        # #E5E5E5 - harder to read
-    }
-)
-```
-
-### **2. Card Elevation:**
-
-```python
-# Create depth with subtle borders
-style={
-    'backgroundColor': COLORS['bg_card'],        # #262626
-    'border': f"1px solid {COLORS['border']}",  # #333333
-    'boxShadow': SHADOWS['lg'],
-}
-```
-
-### **3. Interactive Elements:**
-
-```python
-# Hover states
-':hover': {
-    'backgroundColor': COLORS['bg_hover'],  # #333333
-    'transform': 'translateY(-2px)',
-    'boxShadow': SHADOWS['xl'],
-}
-```
-
----
-
-## **🐛 DEBUGGING TIPS**
-
-### **1. Icon Not Showing?**
-
-```python
-# Check path
-print(get_icon_path('commodities', 'Beras'))
-# Should print: /assets/icons/rice.png
-
-# Verify file exists
-import os
-exists = os.path.exists('web/assets/icons/rice.png')
-print(f"Icon exists: {exists}")
-```
-
-### **2. Dark Theme Issues?**
-
-```python
-# Check text color
-style = {'color': COLORS['text_primary']}
-print(style)  # Should be #FFFFFF
-
-# Verify background
-bg = COLORS['bg_main']
-print(bg)  # Should be #1A1A1A
-```
-
-### **3. Google Fonts Not Loading?**
-
-```python
-# In web/main.py
-from web.design_system import get_google_fonts_link
-
-app.index_string = f'''
-<!DOCTYPE html>
-<html>
-    <head>
-        {get_google_fonts_link()}
-        {{%metas%}}
-        {{%css%}}
-    </head>
-    <body>
-        {{%app_entry%}}
-    </body>
-</html>
-'''
-```
-
----
-
-## **💡 TIPS FOR SUCCESS**
-
-### **Tip 1: Icon Consistency**
-
-All icons should be same style (flat, outlined, solid, etc.)
-
-### **Tip 2: Dark Theme Testing**
-
-Test in different lighting conditions:
-- Bright room
-- Dark room
-- Different screen brightness
-
-### **Tip 3: Color Accessibility**
-
-Use WCAG contrast checker for text:
-- Yellow (#FDDA24) on dark (#1A1A1A) = ✅ Good contrast
-- Gray (#E5E5E5) on dark = ✅ Good
-
-### **Tip 4: Icon Sources**
-
-Download all icons from same source for consistency!
-
----
-
-## **📞 NEED HELP?**
-
-**Design questions:** Check `web/design_system.py`
-**Component questions:** Check `web/components.py`
-**Icon questions:** See `ICON_LIST.md`
-**Code questions:** Ask in team chat
-
----
-
-## **🎉 YOU'RE READY!**
-
-With updated structure:
-- ✅ Yellow-Olive dark theme
-- ✅ Google Fonts (Inter, Poppins)
-- ✅ File-based icons
-- ✅ Proper project organization
-- ✅ Analysis scripts separated
-
-**Happy coding!** 🚀
+**Your dashboard will look professional!** 🚀
