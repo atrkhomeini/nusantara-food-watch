@@ -1,145 +1,93 @@
-# 🎨 NUSANTARA FOOD WATCH - DESIGN SYSTEM
-# Single Source of Truth untuk semua developers
-# Updated: Custom color scheme + Google Fonts + Icon paths
+# 🎨 NUSANTARA FOOD WATCH - DESIGN SYSTEM (FINAL VERSION)
+# Updated: Inline SVG support for UI icons
 
 """
-IMPORTANT: All developers MUST use these constants!
-DO NOT hardcode colors, fonts, or spacing in your pages.
-Always import from this file.
-
 Usage:
-    from web.design_system import COLORS, FONTS, SPACING, ICONS
+    from web.design_system import COLORS, FONTS, get_svg_icon
 """
 
 import os
 
 # ============================================================================
-# 1. COLOR PALETTE (CUSTOM YELLOW-OLIVE THEME)
+# 1. COLOR PALETTE
 # ============================================================================
 
 COLORS = {
-    # Primary Colors (Yellow Theme)
-    'primary': '#FDDA24',           # Bright yellow - main brand color
-    'primary_dark': '#B59E25',      # Darker yellow for accents
-    'primary_light': '#FEE66D',     # Light yellow for highlights
+    'primary': '#FDDA24',
+    'primary_dark': '#B59E25',
+    'primary_light': '#FEE66D',
     
-    # Secondary Colors
-    'secondary': '#B59E25',         # Olive yellow
-    'secondary_dark': '#8B7A1C',    # Darker olive
-    'secondary_light': '#D4C450',   # Light olive
+    'secondary': '#B59E25',
+    'secondary_dark': '#8B7A1C',
+    'secondary_light': '#D4C450',
     
-    # Status Colors
-    'success': '#8CB525',           # Olive green - price down, good
-    'success_light': '#A8D030',     # Light olive green
-    'success_dark': '#6E911D',      # Dark olive green
+    'success': '#8CB525',
+    'success_light': '#A8D030',
+    'success_dark': '#6E911D',
     
-    'warning': '#F8A22D',           # Orange - watch, moderate
-    'warning_light': '#FABC5E',     # Light orange
-    'warning_dark': '#E08A1A',      # Dark orange
+    'warning': '#F8A22D',
+    'warning_light': '#FABC5E',
+    'warning_dark': '#E08A1A',
     
-    'danger': '#EF3340',            # Red - price up, alert
-    'danger_light': '#F36670',      # Light red
-    'danger_dark': '#C92733',       # Dark red
+    'danger': '#EF3340',
+    'danger_light': '#F36670',
+    'danger_dark': '#C92733',
     
-    'info': '#3B82F6',              # Blue - information
-    'info_light': '#60A5FA',        # Light blue
-    'info_dark': '#2563EB',         # Dark blue
+    'info': '#3B82F6',
+    'info_light': '#60A5FA',
+    'info_dark': '#2563EB',
     
-    # Neutral Colors
-    'neutral': '#E5E5E5',           # For text/icons - stable prices
-    'neutral_light': '#F5F5F5',     # Very light gray
-    'neutral_dark': '#A3A3A3',      # Dark gray
+    'neutral': '#E5E5E5',
+    'neutral_light': '#F5F5F5',
+    'neutral_dark': '#A3A3A3',
     
-    # Background Colors (Dark Theme)
-    'bg_main': '#1A1A1A',           # Main background (darker)
-    'bg_card': '#262626',           # Card background
-    'bg_hover': '#333333',          # Hover state
-    'bg_dark': '#0A0A0A',           # Even darker for contrast
+    'bg_main': '#1A1A1A',
+    'bg_card': '#262626',
+    'bg_hover': '#333333',
+    'bg_dark': '#0A0A0A',
     
-    # Text Colors (Adjusted for Dark Theme)
-    'text_primary': '#FFFFFF',      # White text for dark bg
-    'text_secondary': '#E5E5E5',    # Light gray text
-    'text_muted': '#A3A3A3',        # Muted gray text
-    'text_dark': '#1A1A1A',         # Dark text (for light backgrounds)
+    'text_primary': '#FFFFFF',
+    'text_secondary': '#E5E5E5',
+    'text_muted': '#A3A3A3',
+    'text_dark': '#1A1A1A',
     
-    # Border Colors
-    'border': '#333333',            # Subtle border on dark
-    'border_dark': '#262626',       # Darker border
-    'border_focus': '#FDDA24',      # Yellow focus border
+    'border': '#333333',
+    'border_dark': '#262626',
+    'border_focus': '#FDDA24',
 }
-
 
 # ============================================================================
 # 2. TYPOGRAPHY (GOOGLE FONTS)
 # ============================================================================
 
 FONTS = {
-    # Google Font Families
     'family': "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    'family_display': "'Poppins', 'Inter', sans-serif",  # For headings
+    'family_display': "'Poppins', 'Inter', sans-serif",
     'family_mono': "'Fira Code', 'Courier New', monospace",
-    
-    # Google Fonts Import URLs
     'google_fonts_url': 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&family=Fira+Code:wght@400;500&display=swap',
     
-    # Font Sizes
-    'xs': '0.75rem',    # 12px
-    'sm': '0.875rem',   # 14px
-    'base': '1rem',     # 16px
-    'lg': '1.125rem',   # 18px
-    'xl': '1.25rem',    # 20px
-    '2xl': '1.5rem',    # 24px
-    '3xl': '1.875rem',  # 30px
-    '4xl': '2.25rem',   # 36px
-    '5xl': '3rem',      # 48px
+    'xs': '0.75rem', 'sm': '0.875rem', 'base': '1rem', 'lg': '1.125rem',
+    'xl': '1.25rem', '2xl': '1.5rem', '3xl': '1.875rem', '4xl': '2.25rem', '5xl': '3rem',
     
-    # Font Weights
-    'weight_normal': 400,
-    'weight_medium': 500,
-    'weight_semibold': 600,
-    'weight_bold': 700,
-    'weight_extrabold': 800,
+    'weight_normal': 400, 'weight_medium': 500, 'weight_semibold': 600,
+    'weight_bold': 700, 'weight_extrabold': 800,
     
-    # Line Heights
-    'leading_tight': 1.25,
-    'leading_normal': 1.5,
-    'leading_relaxed': 1.75,
+    'leading_tight': 1.25, 'leading_normal': 1.5, 'leading_relaxed': 1.75,
 }
 
-
 # ============================================================================
-# 3. SPACING
+# 3. SPACING & LAYOUT
 # ============================================================================
 
 SPACING = {
-    'xs': '0.25rem',   # 4px
-    'sm': '0.5rem',    # 8px
-    'md': '1rem',      # 16px
-    'lg': '1.5rem',    # 24px
-    'xl': '2rem',      # 32px
-    '2xl': '3rem',     # 48px
-    '3xl': '4rem',     # 64px
-    '4xl': '6rem',     # 96px
+    'xs': '0.25rem', 'sm': '0.5rem', 'md': '1rem', 'lg': '1.5rem',
+    'xl': '2rem', '2xl': '3rem', '3xl': '4rem', '4xl': '6rem',
 }
-
-
-# ============================================================================
-# 4. BORDER RADIUS
-# ============================================================================
 
 RADIUS = {
-    'sm': '0.25rem',   # 4px
-    'md': '0.5rem',    # 8px
-    'lg': '0.75rem',   # 12px
-    'xl': '1rem',      # 16px
-    '2xl': '1.5rem',   # 24px
-    'full': '9999px',  # Fully rounded
+    'sm': '0.25rem', 'md': '0.5rem', 'lg': '0.75rem',
+    'xl': '1rem', '2xl': '1.5rem', 'full': '9999px',
 }
-
-
-# ============================================================================
-# 5. SHADOWS (Adjusted for Dark Theme)
-# ============================================================================
 
 SHADOWS = {
     'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.3)',
@@ -147,227 +95,160 @@ SHADOWS = {
     'lg': '0 4px 6px -1px rgba(0, 0, 0, 0.5)',
     'xl': '0 10px 15px -3px rgba(0, 0, 0, 0.6)',
     '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
-    
-    # Glow effects for dark theme
-    'glow_primary': f'0 0 20px rgba(253, 218, 36, 0.3)',
-    'glow_success': f'0 0 20px rgba(140, 181, 37, 0.3)',
-    'glow_danger': f'0 0 20px rgba(239, 51, 64, 0.3)',
+    'glow_primary': '0 0 20px rgba(253, 218, 36, 0.3)',
+    'glow_success': '0 0 20px rgba(140, 181, 37, 0.3)',
+    'glow_danger': '0 0 20px rgba(239, 51, 64, 0.3)',
 }
-
-
-# ============================================================================
-# 6. BREAKPOINTS (Responsive)
-# ============================================================================
 
 BREAKPOINTS = {
-    'mobile': '640px',
-    'tablet': '768px',
-    'desktop': '1024px',
-    'wide': '1280px',
-    'ultrawide': '1536px',
+    'mobile': '640px', 'tablet': '768px', 'desktop': '1024px',
+    'wide': '1280px', 'ultrawide': '1536px',
 }
 
+# ============================================================================
+# 4. SVG ICONS (INLINE)
+# ============================================================================
+
+SVG_ICONS = {
+    'arrow-up': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm.53 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v5.69a.75.75 0 0 0 1.5 0v-5.69l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z" clip-rule="evenodd" />
+</svg>''',
+    
+    'arrow-down': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-.53 14.03a.75.75 0 0 0 1.06 0l3-3a.75.75 0 1 0-1.06-1.06l-1.72 1.72V8.25a.75.75 0 0 0-1.5 0v5.69l-1.72-1.72a.75.75 0 0 0-1.06 1.06l3 3Z" clip-rule="evenodd" />
+</svg>''',
+    
+    'arrow-right': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm4.28 10.28a.75.75 0 0 0 0-1.06l-3-3a.75.75 0 1 0-1.06 1.06l1.72 1.72H8.25a.75.75 0 0 0 0 1.5h5.69l-1.72 1.72a.75.75 0 1 0 1.06 1.06l3-3Z" clip-rule="evenodd" />
+</svg>''',
+    
+    'arrow-left': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-4.28 9.22a.75.75 0 0 0 0 1.06l3 3a.75.75 0 1 0 1.06-1.06l-1.72-1.72h5.69a.75.75 0 0 0 0-1.5h-5.69l1.72-1.72a.75.75 0 0 0-1.06-1.06l-3 3Z" clip-rule="evenodd" />
+</svg>''',
+    
+    'menu': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path fill-rule="evenodd" d="M3 6.75A.75.75 0 0 1 3.75 6h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 6.75ZM3 12a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 12Zm0 5.25a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" />
+</svg>''',
+    
+    'close': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clip-rule="evenodd" />
+</svg>''',
+    
+    'search': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path d="M8.25 10.875a2.625 2.625 0 1 1 5.25 0 2.625 2.625 0 0 1-5.25 0Z" />
+  <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.125 4.5a4.125 4.125 0 1 0 2.338 7.524l2.007 2.006a.75.75 0 1 0 1.06-1.06l-2.006-2.007a4.125 4.125 0 0 0-3.399-6.463Z" clip-rule="evenodd" />
+</svg>''',
+    
+    'filter': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path d="M6 12a.75.75 0 0 1-.75-.75v-7.5a.75.75 0 1 1 1.5 0v7.5A.75.75 0 0 1 6 12ZM18 12a.75.75 0 0 1-.75-.75v-7.5a.75.75 0 0 1 1.5 0v7.5A.75.75 0 0 1 18 12ZM6.75 20.25v-1.5a.75.75 0 0 0-1.5 0v1.5a.75.75 0 0 0 1.5 0ZM18.75 18.75v1.5a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 1.5 0ZM12.75 5.25v-1.5a.75.75 0 0 0-1.5 0v1.5a.75.75 0 0 0 1.5 0ZM12 21a.75.75 0 0 1-.75-.75v-7.5a.75.75 0 0 1 1.5 0v7.5A.75.75 0 0 1 12 21ZM3.75 15a2.25 2.25 0 1 0 4.5 0 2.25 2.25 0 0 0-4.5 0ZM12 11.25a2.25 2.25 0 1 1 0-4.5 2.25 2.25 0 0 1 0 4.5ZM15.75 15a2.25 2.25 0 1 0 4.5 0 2.25 2.25 0 0 0-4.5 0Z" />
+</svg>''',
+    
+    'upload': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path d="M11.47 1.72a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1-1.06 1.06l-1.72-1.72V7.5h-1.5V4.06L9.53 5.78a.75.75 0 0 1-1.06-1.06l3-3ZM11.25 7.5V15a.75.75 0 0 0 1.5 0V7.5h3.75a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3h-9a3 3 0 0 1-3-3v-9a3 3 0 0 1 3-3h3.75Z" />
+</svg>''',
+    
+    'download': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path d="M12 1.5a.75.75 0 0 1 .75.75V7.5h-1.5V2.25A.75.75 0 0 1 12 1.5ZM11.25 7.5v5.69l-1.72-1.72a.75.75 0 0 0-1.06 1.06l3 3a.75.75 0 0 0 1.06 0l3-3a.75.75 0 1 0-1.06-1.06l-1.72 1.72V7.5h3.75a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3h-9a3 3 0 0 1-3-3v-9a3 3 0 0 1 3-3h3.75Z" />
+</svg>''',
+    
+    'calendar': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path d="M12 11.993a.75.75 0 0 0-.75.75v.006c0 .414.336.75.75.75h.006a.75.75 0 0 0 .75-.75v-.006a.75.75 0 0 0-.75-.75H12ZM12 16.494a.75.75 0 0 0-.75.75v.005c0 .414.335.75.75.75h.005a.75.75 0 0 0 .75-.75v-.005a.75.75 0 0 0-.75-.75H12ZM8.999 17.244a.75.75 0 0 1 .75-.75h.006a.75.75 0 0 1 .75.75v.006a.75.75 0 0 1-.75.75h-.006a.75.75 0 0 1-.75-.75v-.006ZM7.499 16.494a.75.75 0 0 0-.75.75v.005c0 .414.336.75.75.75h.005a.75.75 0 0 0 .75-.75v-.005a.75.75 0 0 0-.75-.75H7.5ZM13.499 14.997a.75.75 0 0 1 .75-.75h.006a.75.75 0 0 1 .75.75v.005a.75.75 0 0 1-.75.75h-.006a.75.75 0 0 1-.75-.75v-.005ZM14.25 16.494a.75.75 0 0 0-.75.75v.006c0 .414.335.75.75.75h.005a.75.75 0 0 0 .75-.75v-.006a.75.75 0 0 0-.75-.75h-.005ZM15.75 14.995a.75.75 0 0 1 .75-.75h.005a.75.75 0 0 1 .75.75v.006a.75.75 0 0 1-.75.75H16.5a.75.75 0 0 1-.75-.75v-.006ZM13.498 12.743a.75.75 0 0 1 .75-.75h2.25a.75.75 0 1 1 0 1.5h-2.25a.75.75 0 0 1-.75-.75ZM6.748 14.993a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Z" />
+  <path fill-rule="evenodd" d="M18 2.993a.75.75 0 0 0-1.5 0v1.5h-9V2.994a.75.75 0 1 0-1.5 0v1.497h-.752a3 3 0 0 0-3 3v11.252a3 3 0 0 0 3 3h13.5a3 3 0 0 0 3-3V7.492a3 3 0 0 0-3-3H18V2.993ZM3.748 18.743v-7.5a1.5 1.5 0 0 1 1.5-1.5h13.5a1.5 1.5 0 0 1 1.5 1.5v7.5a1.5 1.5 0 0 1-1.5 1.5h-13.5a1.5 1.5 0 0 1-1.5-1.5Z" clip-rule="evenodd" />
+</svg>''',
+    
+    'location': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path fill-rule="evenodd" d="m11.54 22.351.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clip-rule="evenodd" />
+</svg>''',
+    
+    'settings': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path fill-rule="evenodd" d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L9.05 4.889c-.02.12-.115.26-.297.348a7.493 7.493 0 0 0-.986.57c-.166.115-.334.126-.45.083L6.3 5.508a1.875 1.875 0 0 0-2.282.819l-.922 1.597a1.875 1.875 0 0 0 .432 2.385l.84.692c.095.078.17.229.154.43a7.598 7.598 0 0 0 0 1.139c.015.2-.059.352-.153.43l-.841.692a1.875 1.875 0 0 0-.432 2.385l.922 1.597a1.875 1.875 0 0 0 2.282.818l1.019-.382c.115-.043.283-.031.45.082.312.214.641.405.985.57.182.088.277.228.297.35l.178 1.071c.151.904.933 1.567 1.85 1.567h1.844c.916 0 1.699-.663 1.85-1.567l.178-1.072c.02-.12.114-.26.297-.349.344-.165.673-.356.985-.57.167-.114.335-.125.45-.082l1.02.382a1.875 1.875 0 0 0 2.28-.819l.923-1.597a1.875 1.875 0 0 0-.432-2.385l-.84-.692c-.095-.078-.17-.229-.154-.43a7.614 7.614 0 0 0 0-1.139c-.016-.2.059-.352.153-.43l.84-.692c.708-.582.891-1.59.433-2.385l-.922-1.597a1.875 1.875 0 0 0-2.282-.818l-1.02.382c-.114.043-.282.031-.449-.083a7.49 7.49 0 0 0-.985-.57c-.183-.087-.277-.227-.297-.348l-.179-1.072a1.875 1.875 0 0 0-1.85-1.567h-1.843ZM12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" clip-rule="evenodd" />
+</svg>''',
+    
+    'user': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
+</svg>''',
+    
+    'logout': '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path fill-rule="evenodd" d="M16.5 3.75a1.5 1.5 0 0 1 1.5 1.5v13.5a1.5 1.5 0 0 1-1.5 1.5h-6a1.5 1.5 0 0 1-1.5-1.5V15a.75.75 0 0 0-1.5 0v3.75a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V5.25a3 3 0 0 0-3-3h-6a3 3 0 0 0-3 3V9A.75.75 0 1 0 9 9V5.25a1.5 1.5 0 0 1 1.5-1.5h6ZM5.78 8.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 0 0 0 1.06l3 3a.75.75 0 0 0 1.06-1.06l-1.72-1.72H15a.75.75 0 0 0 0-1.5H4.06l1.72-1.72a.75.75 0 0 0 0-1.06Z" clip-rule="evenodd" />
+</svg>''',
+}
+
+def get_svg_icon(icon_name, color=None, size='24px'):
+    """
+    Get SVG icon as HTML string with custom color and size
+    
+    Args:
+        icon_name (str): Icon name from SVG_ICONS
+        color (str): CSS color (default: currentColor)
+        size (str): Icon size (default: '24px')
+    
+    Returns:
+        str: SVG HTML string
+    
+    Example:
+        >>> svg = get_svg_icon('arrow-up', color='#FDDA24', size='32px')
+        >>> html.Div(dangerously_allow_html={'__html': svg})
+    """
+    svg = SVG_ICONS.get(icon_name, SVG_ICONS.get('menu'))  # Default to menu
+    
+    # Add style attributes
+    style = f'width: {size}; height: {size};'
+    if color and color != 'currentColor':
+        style += f' color: {color};'
+    
+    # Insert style into SVG
+    svg = svg.replace('<svg', f'<svg style="{style}"')
+    
+    return svg
 
 # ============================================================================
-# 7. ICON PATHS (From web/assets/icons/)
+# 5. ICON PATHS (PNG FILES)
 # ============================================================================
 
 ICONS = {
-    # Base path for icons
-    'base_path': '/assets/icons/',
+    'base_path': '/assets/icons/',  # ← CHANGE THIS!
     
-    # Commodities (PNG/SVG files)
     'commodities': {
-        'Beras': 'rice.png',
-        'Daging Ayam': 'chicken.png',
-        'Daging Sapi': 'beef.png',
-        'Telur Ayam': 'egg.png',
-        'Bawang Merah': 'onion-red.png',
-        'Bawang Putih': 'garlic.png',
-        'Cabai Merah': 'chili-red.png',
-        'Cabai Rawit': 'chili-green.png',
-        'Minyak Goreng': 'oil.png',
-        'Gula Pasir': 'sugar.png',
+        'Beras': 'commodities/rice.png',  # ← ADD subfolder!
+        'Daging Ayam': 'commodities/chicken.png',
+        'Daging Sapi': 'commodities/beef.png',
+        'Telur Ayam': 'commodities/egg.png',
+        'Bawang Merah': 'commodities/onion-red.png',
+        'Bawang Putih': 'commodities/garlic.png',
+        'Cabai Merah': 'commodities/chili-red.png',
+        'Cabai Rawit': 'commodities/chili-green.png',
+        'Minyak Goreng': 'commodities/oil.png',
+        'Gula Pasir': 'commodities/sugar.png',
     },
     
-    # User roles
     'user_roles': {
-        'government': 'role-government.png',
-        'consumer': 'role-consumer.png',
-        'trader': 'role-trader.png',
-        'researcher': 'role-researcher.png',
-    },
-    
-    # Status icons
-    'status': {
-        'up': 'arrow-up.png',
-        'down': 'arrow-down.png',
-        'stable': 'arrow-right.png',
-        'alert': 'alert.png',
-        'warning': 'warning.png',
-        'success': 'success.png',
-        'info': 'info.png',
-    },
-    
-    # UI icons
-    'ui': {
-        'menu': 'menu.png',
-        'close': 'close.png',
-        'search': 'search.png',
-        'filter': 'filter.png',
-        'download': 'download.png',
-        'upload': 'upload.png',
-        'calendar': 'calendar.png',
-        'location': 'location.png',
-        'settings': 'settings.png',
+        'government': 'roles/role-government.png',  # ← ADD subfolder!
+        'consumer': 'roles/role-consumer.png',
+        'trader': 'roles/role-trader.png',
+        'researcher': 'roles/role-researcher.png',
     },
 }
-
-
-# ============================================================================
-# 8. COMPONENT STYLES (Base Styles for Common Components)
-# ============================================================================
-
-COMPONENT_STYLES = {
-    # Card Style (Dark theme)
-    'card': {
-        'backgroundColor': COLORS['bg_card'],
-        'borderRadius': RADIUS['lg'],
-        'padding': SPACING['lg'],
-        'boxShadow': SHADOWS['md'],
-        'marginBottom': SPACING['lg'],
-        'border': f"1px solid {COLORS['border']}",
-    },
-    
-    # Button Primary (Yellow)
-    'button_primary': {
-        'backgroundColor': COLORS['primary'],
-        'color': COLORS['text_dark'],  # Dark text on yellow
-        'border': 'none',
-        'borderRadius': RADIUS['md'],
-        'padding': f"{SPACING['sm']} {SPACING['lg']}",
-        'fontSize': FONTS['base'],
-        'fontWeight': FONTS['weight_semibold'],
-        'cursor': 'pointer',
-        'transition': 'all 0.2s',
-        'boxShadow': SHADOWS['glow_primary'],
-    },
-    
-    # Button Secondary
-    'button_secondary': {
-        'backgroundColor': 'transparent',
-        'color': COLORS['primary'],
-        'border': f"2px solid {COLORS['primary']}",
-        'borderRadius': RADIUS['md'],
-        'padding': f"{SPACING['sm']} {SPACING['lg']}",
-        'fontSize': FONTS['base'],
-        'fontWeight': FONTS['weight_semibold'],
-        'cursor': 'pointer',
-        'transition': 'all 0.2s',
-    },
-    
-    # Input/Dropdown Style (Dark theme)
-    'input': {
-        'backgroundColor': COLORS['bg_hover'],
-        'color': COLORS['text_primary'],
-        'border': f"2px solid {COLORS['border']}",
-        'borderRadius': RADIUS['md'],
-        'padding': SPACING['sm'],
-        'fontSize': FONTS['base'],
-        'minHeight': '45px',
-    },
-    
-    # Heading Styles (Light text on dark)
-    'heading_1': {
-        'fontSize': FONTS['4xl'],
-        'fontFamily': FONTS['family_display'],
-        'fontWeight': FONTS['weight_bold'],
-        'color': COLORS['text_primary'],
-        'marginBottom': SPACING['md'],
-    },
-    
-    'heading_2': {
-        'fontSize': FONTS['3xl'],
-        'fontFamily': FONTS['family_display'],
-        'fontWeight': FONTS['weight_semibold'],
-        'color': COLORS['text_primary'],
-        'marginBottom': SPACING['sm'],
-    },
-    
-    'heading_3': {
-        'fontSize': FONTS['2xl'],
-        'fontFamily': FONTS['family_display'],
-        'fontWeight': FONTS['weight_semibold'],
-        'color': COLORS['text_primary'],
-        'marginBottom': SPACING['sm'],
-    },
-}
-
-
-# ============================================================================
-# 9. CHART STYLES (Plotly Chart Configurations)
-# ============================================================================
-
-CHART_STYLES = {
-    # Default Chart Layout (Dark theme)
-    'layout': {
-        'template': 'plotly_dark',
-        'font': {
-            'family': FONTS['family'],
-            'size': 14,
-            'color': COLORS['text_primary'],
-        },
-        'paper_bgcolor': COLORS['bg_card'],
-        'plot_bgcolor': COLORS['bg_main'],
-        'hovermode': 'x unified',
-        'margin': {'l': 60, 'r': 40, 't': 60, 'b': 60},
-    },
-    
-    # Line Chart Colors (Yellow-Olive theme)
-    'line_colors': [
-        COLORS['primary'],      # Yellow
-        COLORS['success'],      # Olive green
-        COLORS['warning'],      # Orange
-        COLORS['info'],         # Blue
-        COLORS['danger'],       # Red
-        COLORS['secondary'],    # Olive yellow
-    ],
-    
-    # Bar Chart Colors by Quality
-    'bar_colors': {
-        'Low': COLORS['success'],       # Green = cheap = good
-        'Medium': COLORS['warning'],    # Orange = medium
-        'Premium': COLORS['danger'],    # Red = expensive
-        'Standard': COLORS['neutral'],  # Gray = standard
-    },
-}
-
-
-# ============================================================================
-# 10. UTILITY FUNCTIONS
-# ============================================================================
 
 def get_icon_path(category, name):
-    """
-    Get full path for icon file
-    
-    Args:
-        category (str): Icon category ('commodities', 'user_roles', 'status', 'ui')
-        name (str): Icon name
-    
-    Returns:
-        str: Full path to icon
-    
-    Example:
-        get_icon_path('commodities', 'Beras')  # → '/assets/icons/rice.png'
-    """
+    """Get full path for PNG icon"""
     base = ICONS['base_path']
     filename = ICONS.get(category, {}).get(name, 'default.png')
     return f"{base}{filename}"
 
+# ============================================================================
+# 6. UTILITY FUNCTIONS
+# ============================================================================
+
+def format_currency(value):
+    """Format as Rupiah"""
+    return f"Rp {value:,.0f}"
+
+def format_percent(value):
+    """Format as percentage"""
+    return f"{value:+.1f}%"
 
 def get_trend_color(change_percent):
-    """Get color based on price change percentage"""
+    """Get color based on price change"""
     if change_percent > 5:
         return COLORS['danger']
     elif change_percent > 0:
@@ -377,120 +258,61 @@ def get_trend_color(change_percent):
     else:
         return COLORS['neutral']
 
-
-def get_trend_icon(change_percent):
-    """Get icon path based on price change"""
+def get_trend_icon_svg(change_percent):
+    """Get trend icon SVG"""
     if change_percent > 1:
-        return get_icon_path('status', 'up')
+        return get_svg_icon('arrow-up', COLORS['danger'])
     elif change_percent < -1:
-        return get_icon_path('status', 'down')
+        return get_svg_icon('arrow-down', COLORS['success'])
     else:
-        return get_icon_path('status', 'stable')
-
-
-def format_currency(value):
-    """Format number as Indonesian Rupiah"""
-    return f"Rp {value:,.0f}"
-
-
-def format_percent(value):
-    """Format number as percentage"""
-    return f"{value:+.1f}%"
-
-
-# ============================================================================
-# 11. GOOGLE FONTS LINK (For HTML Head)
-# ============================================================================
+        return get_svg_icon('arrow-right', COLORS['neutral'])
 
 def get_google_fonts_link():
-    """
-    Get Google Fonts link tag for HTML head
-    
-    Returns:
-        str: HTML link tag for Google Fonts
-    
-    Usage in Dash:
-        app.index_string = f'''
-        <!DOCTYPE html>
-        <html>
-            <head>
-                {get_google_fonts_link()}
-                {{%metas%}}
-                {{%css%}}
-            </head>
-            <body>
-                {{%app_entry%}}
-                {{%config%}}
-                {{%scripts%}}
-                {{%renderer%}}
-            </body>
-        </html>
-        '''
-    """
+    """Get Google Fonts HTML link"""
     return f'<link href="{FONTS["google_fonts_url"]}" rel="stylesheet">'
 
+# Component styles (same as before)
+COMPONENT_STYLES = {
+    'card': {
+        'backgroundColor': COLORS['bg_card'],
+        'borderRadius': RADIUS['lg'],
+        'padding': SPACING['lg'],
+        'boxShadow': SHADOWS['md'],
+        'marginBottom': SPACING['lg'],
+        'border': f"1px solid {COLORS['border']}",
+    },
+    'button_primary': {
+        'backgroundColor': COLORS['primary'],
+        'color': COLORS['text_dark'],
+        'border': 'none',
+        'borderRadius': RADIUS['md'],
+        'padding': f"{SPACING['sm']} {SPACING['lg']}",
+        'fontSize': FONTS['base'],
+        'fontWeight': FONTS['weight_semibold'],
+        'cursor': 'pointer',
+        'transition': 'all 0.2s',
+    },
+    'heading_1': {
+        'fontSize': FONTS['4xl'],
+        'fontFamily': FONTS['family_display'],
+        'fontWeight': FONTS['weight_bold'],
+        'color': COLORS['text_primary'],
+        'marginBottom': SPACING['md'],
+    },
+}
 
-# ============================================================================
-# 12. VALIDATION
-# ============================================================================
+CHART_STYLES = {
+    'layout': {
+        'template': 'plotly_dark',
+        'font': {'family': FONTS['family'], 'size': 14, 'color': COLORS['text_primary']},
+        'paper_bgcolor': COLORS['bg_card'],
+        'plot_bgcolor': COLORS['bg_main'],
+        'hovermode': 'x unified',
+        'margin': {'l': 60, 'r': 40, 't': 60, 'b': 60},
+    },
+    'line_colors': [COLORS['primary'], COLORS['success'], COLORS['warning'], COLORS['info'], COLORS['danger']],
+}
 
-def validate_design_system():
-    """Run this to verify all constants are properly defined"""
-    errors = []
-    
-    # Check colors
-    required_colors = ['primary', 'success', 'danger', 'warning', 'bg_main', 'bg_card', 'text_primary']
-    for color in required_colors:
-        if color not in COLORS:
-            errors.append(f"Missing required color: {color}")
-    
-    # Check fonts
-    required_fonts = ['family', 'base', 'weight_normal', 'google_fonts_url']
-    for font in required_fonts:
-        if font not in FONTS:
-            errors.append(f"Missing required font: {font}")
-    
-    # Check icon paths exist (will need actual files)
-    if not os.path.exists('web/assets/icons'):
-        errors.append("Warning: web/assets/icons directory not found")
-    
-    if errors:
-        print("❌ Design System Validation Failed:")
-        for error in errors:
-            print(f"  - {error}")
-        return False
-    else:
-        print("✅ Design System Validation Passed!")
-        print(f"✅ Color scheme: Yellow-Olive theme")
-        print(f"✅ Theme: Dark mode")
-        print(f"✅ Fonts: Google Fonts (Inter, Poppins, Fira Code)")
-        print(f"✅ Icons: File-based from /assets/icons/")
-        return True
-
-
-# ============================================================================
-# 13. EXPORT
-# ============================================================================
-
-__all__ = [
-    'COLORS',
-    'FONTS',
-    'SPACING',
-    'RADIUS',
-    'SHADOWS',
-    'BREAKPOINTS',
-    'ICONS',
-    'COMPONENT_STYLES',
-    'CHART_STYLES',
-    'get_icon_path',
-    'get_trend_color',
-    'get_trend_icon',
-    'format_currency',
-    'format_percent',
-    'get_google_fonts_link',
-]
-
-
-# Run validation when imported
-if __name__ == "__main__":
-    validate_design_system()
+__all__ = ['COLORS', 'FONTS', 'SPACING', 'RADIUS', 'SHADOWS', 'COMPONENT_STYLES', 'CHART_STYLES',
+           'get_svg_icon', 'get_icon_path', 'format_currency', 'format_percent', 'get_trend_color',
+           'get_trend_icon_svg', 'get_google_fonts_link']

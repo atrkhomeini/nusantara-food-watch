@@ -4,6 +4,9 @@ Nusantara Food Watch - Star Schema Version
 
 This replaces src/db/nusantara_db.py for the normalized database.
 Handles inserts into fact_prices with dimension lookups.
+
+UPDATED: Added get_db_connection() and connect() helper functions
+for compatibility with analysis scripts.
 """
 
 import os
@@ -308,6 +311,53 @@ class NusantaraDatabaseNormalized:
 NusantaraDatabase = NusantaraDatabaseNormalized
 
 
+# ============================================================================
+# HELPER FUNCTIONS FOR ANALYSIS SCRIPTS
+# ============================================================================
+
+def get_db_connection():
+    """
+    Simple helper function to get database connection
+    Compatible with pandas pd.read_sql_query()
+    
+    Returns:
+        psycopg2.connection: Database connection
+        
+    Example:
+        >>> conn = get_db_connection()
+        >>> df = pd.read_sql_query("SELECT * FROM fact_prices LIMIT 10", conn)
+        >>> conn.close()
+    """
+    database_url = os.getenv('DATABASE_URL')
+    
+    if not database_url:
+        raise ValueError("❌ DATABASE_URL not found in environment variables. Check your .env file.")
+    
+    try:
+        conn = psycopg2.connect(database_url)
+        logger.info("✅ Database connection established")
+        return conn
+    except Exception as e:
+        logger.error(f"❌ Database connection failed: {e}")
+        raise
+
+
+def connect():
+    """
+    Alias for get_db_connection()
+    For backward compatibility with existing scripts
+    
+    Returns:
+        psycopg2.connection: Database connection
+        
+    Example:
+        >>> conn = connect()
+        >>> df = pd.read_sql_query(query, conn, params={'commodity_id': 1})
+        >>> conn.close()
+    """
+    return get_db_connection()
+
+
 def main():
     """Test the normalized database handler"""
     
@@ -315,6 +365,8 @@ def main():
     print("🇮🇩 NUSANTARA FOOD WATCH - Normalized Database Test")
     print("=" * 70)
     
+    # Test 1: Class-based connection
+    print("\n🧪 Test 1: Class-based connection")
     db = NusantaraDatabaseNormalized()
     
     try:
@@ -342,17 +394,47 @@ def main():
         inserted = db.insert_data(test_df, on_conflict='ignore')
         print(f"✅ Test insert: {inserted} rows")
         
-        print("\n✅ Normalized database handler working correctly!")
+        print("\n✅ Class-based handler working correctly!")
         
     except Exception as e:
-        print(f"\n❌ Test failed: {e}")
+        print(f"\n❌ Test 1 failed: {e}")
         raise
     
     finally:
         db.close()
     
+    # Test 2: Simple connection function
+    print("\n🧪 Test 2: Simple connection function (for analysis scripts)")
+    
+    try:
+        conn = get_db_connection()
+        print("✅ get_db_connection() works!")
+        
+        # Test query
+        df = pd.read_sql_query("SELECT COUNT(*) as count FROM fact_prices", conn)
+        print(f"✅ Query test: {df['count'].iloc[0]} records in database")
+        
+        conn.close()
+        print("✅ Connection closed")
+        
+    except Exception as e:
+        print(f"\n❌ Test 2 failed: {e}")
+        raise
+    
+    # Test 3: connect() alias
+    print("\n🧪 Test 3: connect() alias")
+    
+    try:
+        conn = connect()
+        print("✅ connect() alias works!")
+        conn.close()
+        
+    except Exception as e:
+        print(f"\n❌ Test 3 failed: {e}")
+        raise
+    
     print("\n" + "=" * 70)
-    print("✅ Test complete!")
+    print("✅ All tests passed!")
     print("=" * 70)
 
 

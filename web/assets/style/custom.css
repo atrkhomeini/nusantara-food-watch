@@ -1,0 +1,11 @@
+/* Role card hover effect */
+.role-card:hover {
+    transform: translateY(-8px);
+    border-color: #FDDA24 !important;
+    box-shadow: 0 10px 30px rgba(253, 218, 36, 0.2);
+}
+
+/* Smooth transitions */
+* {
+    transition: all 0.2s ease;
+}
