@@ -351,15 +351,54 @@ Test completed successfully.
 
 
 # Convenience functions for backward compatibility
-def send_success_email(message: str = "Operation completed successfully") -> None:
+def send_success_email(subject: str = None, body: str = None, message: str = "Operation completed successfully") -> None:
     """
-    Generic success email - calls send_scrape_success_email
+    Generic success email - sends custom email or calls send_scrape_success_email
     
     Args:
-        message: Custom message (optional)
+        subject: Email subject (optional)
+        body: Email body (optional)
+        message: Custom message (for backward compatibility)
     """
-    # For now, just use default behavior
-    send_scrape_success_email(records_count=0)
+    # If custom subject and body provided, send custom email
+    if subject and body:
+        import os
+        import smtplib
+        from email.mime.text import MIMEText
+        from email.mime.multipart import MIMEMultipart
+        
+        # Get email credentials from environment
+        email_from = os.getenv('EMAIL_ADDRESS')
+        email_to = os.getenv('ALERT_EMAIL')
+        email_password = os.getenv('EMAIL_APP_PASSWORD')
+        
+        if not all([email_from, email_to, email_password]):
+            print("⚠️  Email not configured, skipping notification")
+            return
+        
+        # Create email
+        msg = MIMEMultipart()
+        msg['From'] = email_from
+        msg['To'] = email_to
+        msg['Subject'] = subject
+        
+        msg.attach(MIMEText(body, 'plain'))
+        
+        # Send email
+        try:
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.starttls()
+            server.login(email_from, email_password)
+            server.send_message(msg)
+            server.quit()
+            
+            print("✅ Success email sent")
+        
+        except Exception as e:
+            print(f"❌ Failed to send email: {e}")
+    else:
+        # For backward compatibility, just use default behavior
+        send_scrape_success_email(records_count=0)
 
 
 def send_failure_email(error_message: str) -> bool:
