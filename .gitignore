@@ -30,3 +30,4 @@ data/processed/*
 Thumbs.db
 dump/
 reports/figures/
+node_modules/
