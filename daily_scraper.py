@@ -1,13 +1,10 @@
 """
 COMPLETE DAILY SCRAPER - Categories + Subcategories
 Scrapes BOTH category-level AND subcategory-level data
-
-This ensures complete coverage:
-- Categories (cat_*): For aggregated analysis
-- Subcategories (com_*): For quality-level detail
+Iterates through ALL Market Types.
 
 Usage:
-    python daily_scraper_complete.py
+    python daily_scraper.py
 """
 
 import sys
@@ -23,6 +20,7 @@ sys.path.insert(0, str(project_root))
 
 from src.scraper.app_scraper import EnhancedMultiCommodityScraper
 from src.db.nusantara_db import NusantaraDatabaseNormalized
+from src.utils.notifications import send_success_email, send_failure_email
 
 logging.basicConfig(
     level=logging.INFO,
@@ -80,17 +78,18 @@ def scrape_complete_daily(days_back: int = 7, market_type_id: int = 1):
         market_type_id: 1=Traditional, 2=Modern, 3=Wholesale, 4=Producer
     """
     
+    # Get Market Name for logging
+    market_name = EnhancedMultiCommodityScraper.MARKET_TYPES.get(market_type_id, f"Market {market_type_id}")
+    
     start_time = datetime.now()
     
-    logger.info("="*70)
-    logger.info("📅 COMPLETE DAILY SCRAPER - Categories + Subcategories")
-    logger.info("="*70)
-    logger.info(f"Run time: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+    logger.info("\n" + "#"*70)
+    logger.info(f"🏗️  SCRAPING MARKET: {market_name.upper()} (ID: {market_type_id})")
+    logger.info("#"*70)
     
     # Date range
     end_date = datetime.now()
     start_date = end_date - timedelta(days=days_back)
-    logger.info(f"Period: {start_date.date()} to {end_date.date()}")
     
     # Statistics
     stats = {
@@ -123,13 +122,9 @@ def scrape_complete_daily(days_back: int = 7, market_type_id: int = 1):
     # PART 1: SCRAPE CATEGORIES (cat_1 to cat_10)
     # ==================================================================
     
-    logger.info(f"\n{'='*70}")
-    logger.info(f"📦 PART 1: SCRAPING CATEGORIES ({len(CATEGORIES)} items)")
-    logger.info(f"{'='*70}")
+    logger.info(f"📦 [{market_name}] Scraping Categories...")
     
     for idx, (cat_id, cat_info) in enumerate(CATEGORIES.items(), 1):
-        logger.info(f"\n[{idx}/{len(CATEGORIES)}] {cat_info['name']} ({cat_id})")
-        
         try:
             df = scraper.scrape_commodity(
                 commodity_id=cat_id,
@@ -140,13 +135,12 @@ def scrape_complete_daily(days_back: int = 7, market_type_id: int = 1):
             )
             
             if df.empty:
-                logger.info(f"   ⚠️  No data")
                 stats['categories_failed'] += 1
                 continue
             
             # Add metadata
             df['db_commodity_id'] = cat_info['commodity_id']
-            df['subcategory_id_mapped'] = None  # Categories don't have subcategory
+            df['subcategory_id_mapped'] = None
             
             # Insert
             inserted = insert_to_database(db, df, province_map, subcategory_map, is_category=True)
@@ -154,12 +148,12 @@ def scrape_complete_daily(days_back: int = 7, market_type_id: int = 1):
             stats['categories_scraped'] += 1
             stats['total_inserted'] += inserted
             
-            logger.info(f"   ✅ {inserted} records inserted")
+            logger.info(f"   [{cat_info['name']}] ✅ {inserted} rows")
             
         except Exception as e:
-            logger.error(f"   ❌ Error: {e}")
+            logger.error(f"   ❌ Error {cat_info['name']}: {e}")
             stats['categories_failed'] += 1
-            stats['errors'].append(f"{cat_id}: {e}")
+            stats['errors'].append(f"{market_name}-{cat_id}: {e}")
         
         time.sleep(1)
     
@@ -167,13 +161,9 @@ def scrape_complete_daily(days_back: int = 7, market_type_id: int = 1):
     # PART 2: SCRAPE SUBCATEGORIES (com_1 to com_21)
     # ==================================================================
     
-    logger.info(f"\n{'='*70}")
-    logger.info(f"📦 PART 2: SCRAPING SUBCATEGORIES ({len(SUBCATEGORIES)} items)")
-    logger.info(f"{'='*70}")
+    logger.info(f"📦 [{market_name}] Scraping Subcategories...")
     
     for idx, (subcom_id, subcom_info) in enumerate(SUBCATEGORIES.items(), 1):
-        logger.info(f"\n[{idx}/{len(SUBCATEGORIES)}] {subcom_info['name']} ({subcom_id})")
-        
         try:
             df = scraper.scrape_commodity(
                 commodity_id=subcom_id,
@@ -184,7 +174,6 @@ def scrape_complete_daily(days_back: int = 7, market_type_id: int = 1):
             )
             
             if df.empty:
-                logger.info(f"   ⚠️  No data")
                 stats['subcategories_failed'] += 1
                 continue
             
@@ -199,53 +188,23 @@ def scrape_complete_daily(days_back: int = 7, market_type_id: int = 1):
             stats['subcategories_scraped'] += 1
             stats['total_inserted'] += inserted
             
-            logger.info(f"   ✅ {inserted} records inserted")
+            logger.info(f"   [{subcom_info['name']}] ✅ {inserted} rows")
             
         except Exception as e:
-            logger.error(f"   ❌ Error: {e}")
+            logger.error(f"   ❌ Error {subcom_info['name']}: {e}")
             stats['subcategories_failed'] += 1
-            stats['errors'].append(f"{subcom_id}: {e}")
+            stats['errors'].append(f"{market_name}-{subcom_id}: {e}")
         
         time.sleep(1)
     
-    # Final stats
-    stats['end_time'] = datetime.now()
-    stats['duration'] = (stats['end_time'] - stats['start_time']).total_seconds()
-    
-    logger.info(f"\n{'='*70}")
-    logger.info("📊 COMPLETE DAILY SCRAPE FINISHED")
-    logger.info(f"{'='*70}")
-    logger.info(f"Duration: {stats['duration']:.1f} seconds")
-    logger.info(f"\nCategories:")
-    logger.info(f"  ✅ Scraped: {stats['categories_scraped']}/{len(CATEGORIES)}")
-    logger.info(f"  ❌ Failed: {stats['categories_failed']}")
-    logger.info(f"\nSubcategories:")
-    logger.info(f"  ✅ Scraped: {stats['subcategories_scraped']}/{len(SUBCATEGORIES)}")
-    logger.info(f"  ❌ Failed: {stats['subcategories_failed']}")
-    logger.info(f"\n💾 Total inserted: {stats['total_inserted']:,} records")
-    
-    if stats['errors']:
-        logger.warning(f"\n⚠️  Errors ({len(stats['errors'])}):")
-        for err in stats['errors'][:5]:
-            logger.warning(f"   {err}")
-    
     db.close()
-    
     return stats
 
 
 def insert_to_database(db, df, province_map, subcategory_map, is_category=False):
     """
-    Insert data to database
-    
-    Args:
-        db: Database connection
-        df: DataFrame with scraped data
-        province_map: Province name → ID mapping
-        subcategory_map: Subcategory name → ID mapping
-        is_category: True if category-level (NULL subcategory_id)
+    Insert data to database (Same as before)
     """
-    
     # Map provinces
     df['province_id'] = df['provinsi'].map(province_map)
     
@@ -255,7 +214,6 @@ def insert_to_database(db, df, province_map, subcategory_map, is_category=False)
         if pd.isna(row['province_id']) or pd.isna(row['harga']):
             continue
         
-        # Subcategory ID (NULL for categories, mapped for subcategories)
         if is_category:
             subcategory_id = None
         else:
@@ -284,14 +242,12 @@ def insert_to_database(db, df, province_map, subcategory_map, is_category=False)
         VALUES (%s, %s, %s, %s, %s, %s)
         ON CONFLICT DO NOTHING
     """
-    
     try:
         cursor.executemany(insert_query, records)
         db.conn.commit()
         inserted = cursor.rowcount
         cursor.close()
         return inserted
-    
     except Exception as e:
         db.conn.rollback()
         cursor.close()
@@ -299,40 +255,36 @@ def insert_to_database(db, df, province_map, subcategory_map, is_category=False)
         return 0
 
 
-def send_notification(stats):
-    """Send email notification with results"""
+def send_aggregated_notification(total_stats):
+    """Send summary email for ALL markets"""
     
     try:
-        from src.utils.notifications import send_success_email, send_failure_email
-        
-        total_scraped = stats['categories_scraped'] + stats['subcategories_scraped']
-        total_items = len(CATEGORIES) + len(SUBCATEGORIES)
-        
-        if stats['total_inserted'] > 0:
+        if total_stats['total_inserted'] > 0:
             send_success_email(
-                subject=f"✅ Complete Daily Scrape - {stats['total_inserted']:,} records",
+                subject=f"✅ Daily Scrape Complete - {total_stats['total_inserted']:,} records",
                 body=f"""
-Nusantara Food Watch - Complete Daily Scraper Report
-
+Nusantara Food Watch - Daily Scraper Report
 Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-Duration: {stats['duration']:.1f} seconds
+Duration: {total_stats['duration']:.1f} seconds
 
-Categories (Aggregated):
-  ✅ Scraped: {stats['categories_scraped']}/10
-  ❌ Failed: {stats['categories_failed']}
+Markets Processed: {total_stats['markets_count']}
 
-Subcategories (Quality-Level):
-  ✅ Scraped: {stats['subcategories_scraped']}/21
-  ❌ Failed: {stats['subcategories_failed']}
+Summary:
+  Total Records Inserted: {total_stats['total_inserted']:,}
+  
+  Categories (Across all markets):
+    Scraped: {total_stats['categories_scraped']}
+    Failed: {total_stats['categories_failed']}
+    
+  Subcategories (Across all markets):
+    Scraped: {total_stats['subcategories_scraped']}
+    Failed: {total_stats['subcategories_failed']}
 
-Total: {total_scraped}/{total_items} items
-Database inserted: {stats['total_inserted']:,} records
-
-Status: ✅ SUCCESS
+Status: 200 - SUCCESS
                 """
             )
         else:
-            send_failure_email(f"No data inserted. Check logs.")
+            send_failure_email(f"Daily scrape finished but NO data was inserted from any market.")
         
         logger.info("✅ Email notification sent")
     
@@ -341,30 +293,76 @@ Status: ✅ SUCCESS
 
 
 def main():
-    """Main execution"""
+    """Main execution - Loops through ALL Market Types"""
+    
+    start_time_global = datetime.now()
+    
+    # Initialize Global Stats
+    global_stats = {
+        'total_inserted': 0,
+        'categories_scraped': 0,
+        'categories_failed': 0,
+        'subcategories_scraped': 0,
+        'subcategories_failed': 0,
+        'markets_count': 0,
+        'errors': []
+    }
     
     try:
-        # Run complete scrape
-        stats = scrape_complete_daily(
-            days_back=7,
-            market_type_id=1
-        )
+        # Get all market types from the Scraper Class
+        # {1: 'Pasar Tradisional', 2: 'Pasar Modern', ...}
+        market_types = EnhancedMultiCommodityScraper.MARKET_TYPES
         
-        # Send notification
-        send_notification(stats)
+        logger.info("="*70)
+        logger.info(f"🚀 STARTING DAILY SCRAPE FOR {len(market_types)} MARKETS")
+        logger.info("="*70)
         
-        # Exit
-        if stats['total_inserted'] > 0:
-            logger.info("\n✅ Daily scrape successful!")
+        # Loop through each market
+        for market_id, market_name in market_types.items():
+            try:
+                # Run scrape for this specific market
+                stats = scrape_complete_daily(
+                    days_back=7,
+                    market_type_id=market_id
+                )
+                
+                # Aggregate results
+                global_stats['total_inserted'] += stats['total_inserted']
+                global_stats['categories_scraped'] += stats['categories_scraped']
+                global_stats['categories_failed'] += stats['categories_failed']
+                global_stats['subcategories_scraped'] += stats['subcategories_scraped']
+                global_stats['subcategories_failed'] += stats['subcategories_failed']
+                global_stats['errors'].extend(stats['errors'])
+                global_stats['markets_count'] += 1
+                
+            except Exception as e:
+                logger.error(f"❌ Critical failure for market {market_name}: {e}")
+                global_stats['errors'].append(f"CRITICAL {market_name}: {e}")
+        
+        # Calculate total duration
+        global_stats['duration'] = (datetime.now() - start_time_global).total_seconds()
+        
+        # Log Final Summary
+        logger.info("\n" + "="*70)
+        logger.info("🏁 GLOBAL SCRAPE FINISHED")
+        logger.info("="*70)
+        logger.info(f"Total Markets: {global_stats['markets_count']}")
+        logger.info(f"Total Inserted: {global_stats['total_inserted']:,} records")
+        
+        # Send one consolidated email
+        send_aggregated_notification(global_stats)
+        
+        if global_stats['total_inserted'] > 0:
             exit(0)
         else:
-            logger.warning("\n⚠️ No data inserted!")
+            logger.warning("⚠️ No data inserted in total!")
             exit(1)
-    
+            
     except Exception as e:
-        logger.error(f"\n❌ Daily scrape failed: {e}")
+        logger.error(f"\n❌ Global scrape script failed: {e}")
         import traceback
         traceback.print_exc()
+        send_failure_email(f"Script crashed: {e}")
         exit(1)
 
 
